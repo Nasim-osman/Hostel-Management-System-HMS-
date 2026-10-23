@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static humanize %}
 
 {% block title %}Hostel Management — HMS{% endblock %}
 
@@ -75,11 +75,11 @@
             <h2 class="hms-card-title">Payment</h2>
             <div class="grid grid-cols-2 text-center pt-2">
                 <div>
-                    <div class="stat-number-green">₹ {{ total_paid|floatformat:0 }}</div>
+                    <div class="stat-number-green">₹ {{ total_paid|floatformat:0|intcomma }}</div>
                     <div class="text-xs text-gray-500 font-medium mt-1">Paid</div>
                 </div>
                 <div>
-                    <div class="text-[26px] font-bold text-[#1e293b]">₹ {{ total_unpaid|floatformat:0 }}</div>
+                    <div class="text-[26px] font-bold text-[#1e293b]">₹ {{ total_unpaid|floatformat:0|intcomma }}</div>
                     <div class="text-xs text-gray-500 font-medium mt-1">Unpaid</div>
                 </div>
             </div>
