@@ -43,10 +43,10 @@
                     </td>
                     <td>{{ ch.fee_category.name }}</td>
                     <td>{{ ch.description }}</td>
-                    <td class="font-semibold text-gray-900">₹ {{ ch.amount }}</td>
-                    <td class="font-semibold text-green-700">₹ {{ ch.paid_amount }}</td>
+                    <td class="font-semibold text-gray-900">৳ {{ ch.amount }}</td>
+                    <td class="font-semibold text-green-700">৳ {{ ch.paid_amount }}</td>
                     <td class="font-bold {% if ch.balance_remaining > 0 %}text-red-600{% else %}text-gray-400{% endif %}">
-                        ₹ {{ ch.balance_remaining }}
+                        ৳ {{ ch.balance_remaining }}
                     </td>
                     <td>{{ ch.due_date }}</td>
                     <td>

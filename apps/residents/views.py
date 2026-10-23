@@ -66,7 +66,7 @@ def resident_detail_view(request, resident_id):
     charges = ResidentCharge.objects.filter(resident=resident).order_by('-due_date')
     payments = Payment.objects.filter(resident=resident).order_by('-payment_date')
     complaints = Complaint.objects.filter(resident=resident).order_by('-created_at')
-    outpasses = OutpassRequest.objects.filter(resident=resident).order_by('-departure_date')
+    outpasses = OutpassRequest.objects.filter(resident=resident).order_by('-departure_time')
 
     total_charged = charges.aggregate(Sum('amount'))['amount__sum'] or 0
     total_paid = payments.filter(status='VERIFIED').aggregate(Sum('amount'))['amount__sum'] or 0
@@ -134,7 +134,7 @@ def resident_dashboard_view(request):
     charges = ResidentCharge.objects.filter(resident=resident).order_by('-due_date')[:5]
     payments = Payment.objects.filter(resident=resident).order_by('-payment_date')[:5]
     complaints = Complaint.objects.filter(resident=resident).order_by('-created_at')[:5]
-    outpasses = OutpassRequest.objects.filter(resident=resident).order_by('-departure_date')[:5]
+    outpasses = OutpassRequest.objects.filter(resident=resident).order_by('-departure_time')[:5]
     
     total_charged = ResidentCharge.objects.filter(resident=resident).aggregate(Sum('amount'))['amount__sum'] or 0
     total_paid = Payment.objects.filter(resident=resident, status='VERIFIED').aggregate(Sum('amount'))['amount__sum'] or 0

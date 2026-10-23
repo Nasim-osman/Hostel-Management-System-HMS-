@@ -60,3 +60,32 @@ class ViewIntegrationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'application/pdf')
         self.assertIn('HMS-Receipt-HMS-REC-TEST-9999.pdf', response.headers['Content-Disposition'])
+
+    def test_resident_dashboard_view_renders_successfully(self):
+        """IT-008: Resident dashboard renders without FieldError and handles outpasses."""
+        from apps.attendance.models import OutpassRequest
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        OutpassRequest.objects.create(
+            resident=self.resident,
+            purpose='Weekend Family Visit',
+            destination_address='Dhanmondi, Dhaka',
+            departure_time=timezone.now(),
+            expected_return_time=timezone.now() + timedelta(days=2),
+            parent_contact='+880 1711-223344'
+        )
+        self.client.login(username='mike_test', password='password123')
+        response = self.client.get(reverse('residents:resident_dashboard'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Hostel Fee Balance', response.content.decode('utf-8'))
+
+    def test_bangladeshi_number_and_currency_formatting(self):
+        """IT-009: Test South Asian / Bangladeshi lakh grouping format."""
+        from apps.finance.templatetags.hms_tags import bd_format, taka
+        self.assertEqual(bd_format(120345), '1,20,345')
+        self.assertEqual(bd_format(20345), '20,345')
+        self.assertEqual(bd_format(1000000), '10,00,000')
+        self.assertEqual(bd_format(500), '500')
+        self.assertEqual(taka(120345), '৳ 1,20,345')
+

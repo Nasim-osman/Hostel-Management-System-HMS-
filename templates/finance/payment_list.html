@@ -43,7 +43,7 @@
                         <div class="text-[11px] text-gray-400">ID: {{ p.resident.student_id }}</div>
                     </td>
                     <td>{{ p.charge.description|default:"General Hostel Payment" }}</td>
-                    <td class="font-bold text-green-700">₹ {{ p.amount }}</td>
+                    <td class="font-bold text-green-700">৳ {{ p.amount }}</td>
                     <td>{{ p.payment_date }}</td>
                     <td>{{ p.get_payment_method_display }}</td>
                     <td class="text-xs text-gray-500">{{ p.transaction_reference|default:"-" }}</td>

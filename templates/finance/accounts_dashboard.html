@@ -26,19 +26,19 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div class="hms-card py-3">
             <div class="text-xs text-gray-500 font-medium">Total Fees Collected</div>
-            <div class="text-2xl font-bold text-green-700 mt-1">₹ {{ total_paid|floatformat:0 }}</div>
+            <div class="text-2xl font-bold text-green-700 mt-1">৳ {{ total_paid|floatformat:0 }}</div>
         </div>
         <div class="hms-card py-3">
             <div class="text-xs text-gray-500 font-medium">Outstanding Dues</div>
-            <div class="text-2xl font-bold text-red-600 mt-1">₹ {{ total_unpaid|floatformat:0 }}</div>
+            <div class="text-2xl font-bold text-red-600 mt-1">৳ {{ total_unpaid|floatformat:0 }}</div>
         </div>
         <div class="hms-card py-3">
             <div class="text-xs text-gray-500 font-medium">Operating Expenses</div>
-            <div class="text-2xl font-bold text-slate-800 mt-1">₹ {{ total_expenses|floatformat:0 }}</div>
+            <div class="text-2xl font-bold text-slate-800 mt-1">৳ {{ total_expenses|floatformat:0 }}</div>
         </div>
         <div class="hms-card py-3">
             <div class="text-xs text-gray-500 font-medium">Penalties & Fines</div>
-            <div class="text-2xl font-bold text-amber-600 mt-1">₹ {{ total_fines|floatformat:0 }}</div>
+            <div class="text-2xl font-bold text-amber-600 mt-1">৳ {{ total_fines|floatformat:0 }}</div>
         </div>
         <div class="hms-card py-3">
             <div class="text-xs text-gray-500 font-medium">Pending Verifications</div>
@@ -63,7 +63,7 @@
                         <div class="text-[10px] text-gray-400">{{ p.payment_date }} &bull; {{ p.get_payment_method_display }}</div>
                     </div>
                     <div class="text-right">
-                        <div class="text-sm font-bold text-green-700">₹ {{ p.amount }}</div>
+                        <div class="text-sm font-bold text-green-700">৳ {{ p.amount }}</div>
                         <a href="{% url 'finance:download_receipt' p.receipt_number %}" class="text-[11px] text-blue-600 font-semibold hover:underline">
                             Download PDF
                         </a>
@@ -90,7 +90,7 @@
                         <div class="text-[10px] text-gray-400">{{ e.expense_date }}</div>
                     </div>
                     <div class="text-right">
-                        <div class="text-sm font-bold text-slate-900">₹ {{ e.amount }}</div>
+                        <div class="text-sm font-bold text-slate-900">৳ {{ e.amount }}</div>
                         <span class="text-[10px] text-gray-400">{{ e.invoice_number|default:"No invoice" }}</span>
                     </div>
                 </div>

@@ -45,7 +45,7 @@ class ResidentCharge(models.Model):
         ordering = ['-due_date', '-created_at']
 
     def __str__(self):
-        return f"{self.resident.student_id} - {self.description} (₹{self.amount})"
+        return f"{self.resident.student_id} - {self.description} (৳{self.amount})"
 
     @property
     def balance_remaining(self):
@@ -54,10 +54,13 @@ class ResidentCharge(models.Model):
 
 class Payment(models.Model):
     class PaymentMethod(models.TextChoices):
-        UPI = 'UPI', 'UPI / QR Code'
-        BANK_TRANSFER = 'NET_BANKING', 'Net Banking / NEFT'
-        CARD = 'CARD', 'Credit / Debit Card'
-        CASH = 'CASH', 'Cash'
+        BKASH = 'BKASH', 'bKash'
+        NAGAD = 'NAGAD', 'Nagad'
+        ROCKET = 'ROCKET', 'Rocket (DBBL)'
+        BANK_TRANSFER = 'BANK_TRANSFER', 'Bank Deposit / Sonali Bank'
+        CARD = 'CARD', 'Debit / Credit Card'
+        CASH = 'CASH', 'Cash Counter'
+        UPI = 'UPI', 'MFS / Online'
         CHEQUE = 'CHEQUE', 'Cheque / Demand Draft'
 
     class Status(models.TextChoices):

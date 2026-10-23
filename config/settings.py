@@ -110,7 +110,7 @@ LOGOUT_REDIRECT_URL = 'accounts:login'
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = os.getenv('TIME_ZONE', 'Asia/Kolkata')
+TIME_ZONE = os.getenv('TIME_ZONE', 'Asia/Dhaka')
 USE_I18N = True
 USE_TZ = True
 
@@ -126,4 +126,4 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Application specific settings
-CURRENCY_SYMBOL = os.getenv('CURRENCY_SYMBOL', '₹')
+CURRENCY_SYMBOL = os.getenv('CURRENCY_SYMBOL', '৳')

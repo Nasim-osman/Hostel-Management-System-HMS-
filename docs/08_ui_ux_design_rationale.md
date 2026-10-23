@@ -26,8 +26,8 @@ The primary Hostel Management Dashboard layout (`templates/dashboard/hostel_dash
      - Vacant: `50` (`#dc2626`, font-size 26px bold)
 2. **Payment Summary Card (Col 4):**
    - 2-column financial health view:
-     - Paid: `₹ 1,20,345` (bold emerald green)
-     - Unpaid: `₹ 20,345` (bold dark slate)
+     - Paid: `৳ 1,20,345` (bold emerald green)
+     - Unpaid: `৳ 20,345` (bold dark slate)
 3. **Amenities Status Card (Col 4):**
    - Horizontal status ribbon displaying Light, Water, Wifi, Laundry, and Hot Water with operational status badges.
 4. **Tenants / Capacity Donut Card (Col 4):**
@@ -50,7 +50,7 @@ The primary Hostel Management Dashboard layout (`templates/dashboard/hostel_dash
      - `Building A | Floor 2nd | Room 201`
      - `Building A | Floor 1st | Room 103`
 8. **Reports Card (Col 6):**
-   - Quick-action analytical links: `Total Number of Vacant Room` (50) and `Total Fees Collected` (₹ 1,20,345).
+   - Quick-action analytical links: `Total Number of Vacant Room` (50) and `Total Fees Collected` (৳ 1,20,345).
 
 ---
 

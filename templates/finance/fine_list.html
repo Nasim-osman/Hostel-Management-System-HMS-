@@ -35,7 +35,7 @@
                     <td class="font-bold text-[#0060af]">#{{ fine.id }}</td>
                     <td class="font-semibold">{{ fine.resident.user.get_full_name }} ({{ fine.resident.student_id }})</td>
                     <td>{{ fine.reason }}</td>
-                    <td class="font-bold text-red-600">₹ {{ fine.amount }}</td>
+                    <td class="font-bold text-red-600">৳ {{ fine.amount }}</td>
                     <td>{{ fine.issued_date }}</td>
                     <td>{{ fine.issued_by.get_full_name|default:fine.issued_by.username }}</td>
                     <td>

@@ -20,7 +20,7 @@ The interface is designed to match standard university residential administrativ
 - **Sidebar:** Dark Slate Navy (`#1a2634`) with vertical navigation icons and labels.
 - **Dashboard:** 8 high-contrast operational cards:
   - **Rooms:** Total 200, Occupied 150, Vacant 50
-  - **Payment:** Paid ₹ 1,20,345 & Unpaid ₹ 20,345
+  - **Payment:** Paid ৳ 1,20,345 & Unpaid ৳ 20,345 (Bangladeshi Taka / BDT)
   - **Amenities:** Light, Water, Wifi, Laundry, Hot Water status
   - **Tenants:** Donut ring showing 75% occupancy (Capacity 500, Occupied 375)
   - **Mess:** Today's meal (Breakfast, Lunch, Dinner veg/non-veg)

@@ -27,10 +27,10 @@ class Command(BaseCommand):
 
         # 1. Create Core Role Users
         users_data = [
-            {'username': 'admin', 'email': 'admin@hms.university.edu', 'first_name': 'Alexander', 'last_name': 'Wright', 'role': User.Role.ADMIN, 'phone': '+91 98765 00001'},
-            {'username': 'warden', 'email': 'warden@hms.university.edu', 'first_name': 'Eleanor', 'last_name': 'Vance', 'role': User.Role.WARDEN, 'phone': '+91 98765 00002'},
-            {'username': 'accounts', 'email': 'accounts@hms.university.edu', 'first_name': 'Robert', 'last_name': 'Sterling', 'role': User.Role.ACCOUNTS, 'phone': '+91 98765 00003'},
-            {'username': 'maintenance', 'email': 'maintenance@hms.university.edu', 'first_name': 'David', 'last_name': 'Miller', 'role': User.Role.MAINTENANCE, 'phone': '+91 98765 00004'},
+            {'username': 'admin', 'email': 'admin@hms.university.edu', 'first_name': 'Kazi Tanvir', 'last_name': 'Ahmed', 'role': User.Role.ADMIN, 'phone': '+880 1711 000001'},
+            {'username': 'warden', 'email': 'warden@hms.university.edu', 'first_name': 'Dr. Mohammad', 'last_name': 'Rafiq', 'role': User.Role.WARDEN, 'phone': '+880 1819 000002'},
+            {'username': 'accounts', 'email': 'accounts@hms.university.edu', 'first_name': 'Mahfuzur', 'last_name': 'Rahman', 'role': User.Role.ACCOUNTS, 'phone': '+880 1912 000003'},
+            {'username': 'maintenance', 'email': 'maintenance@hms.university.edu', 'first_name': 'Md. Abul', 'last_name': 'Kalam', 'role': User.Role.MAINTENANCE, 'phone': '+880 1515 000004'},
         ]
 
         created_users = {}
@@ -134,11 +134,11 @@ class Command(BaseCommand):
 
         # 4. Create Key Named Residents (Exact match to screenshot tickets: Mike Ross, Jennifer Grint, Casey Allen, Tina Harris, Rick Butcher)
         named_residents_data = [
-            {'username': 'resident_mike', 'name': ('Mike', 'Ross'), 'email': 'mike.ross@student.edu', 'id': 'HMS-RES-2026-001', 'course': 'Law / LL.B', 'room_idx': 0, 'ticket': 'Water not Comming', 'category': Complaint.Category.PLUMBING},
-            {'username': 'resident_jennifer', 'name': ('Jennifer', 'Grint'), 'email': 'jennifer.g@student.edu', 'id': 'HMS-RES-2026-002', 'course': 'Computer Science B.Tech', 'room_idx': 1, 'ticket': 'Light is not available since last night', 'category': Complaint.Category.ELECTRICAL},
-            {'username': 'resident_casey', 'name': ('Casey', 'Allen'), 'email': 'casey.a@student.edu', 'id': 'HMS-RES-2026-003', 'course': 'Electrical Engineering', 'room_idx': 2, 'ticket': 'Wifi is not working since past week, please fix it.', 'category': Complaint.Category.WIFI},
-            {'username': 'resident_tina', 'name': ('Tina', 'Harris'), 'email': 'tina.h@student.edu', 'id': 'HMS-RES-2026-004', 'course': 'Mechanical Engineering', 'room_idx': 3, 'ticket': 'Laundry is not working properly, please look into this quickly', 'category': Complaint.Category.LAUNDRY},
-            {'username': 'resident_rick', 'name': ('Rick', 'Butcher'), 'email': 'rick.b@student.edu', 'id': 'HMS-RES-2026-005', 'course': 'Civil Engineering', 'room_idx': 4, 'ticket': 'Hot water tap is broken, please fix it urgently', 'category': Complaint.Category.PLUMBING},
+            {'username': 'resident_mike', 'name': ('Mike', 'Ross'), 'email': 'mike.ross@student.edu', 'id': 'DU-CSE-2022-001', 'course': 'Computer Science & Eng. (B.Sc)', 'room_idx': 0, 'ticket': 'Water not Comming', 'category': Complaint.Category.PLUMBING},
+            {'username': 'resident_jennifer', 'name': ('Jennifer', 'Grint'), 'email': 'jennifer.g@student.edu', 'id': 'DU-EEE-2022-002', 'course': 'Electrical & Electronic Eng.', 'room_idx': 1, 'ticket': 'Light is not available since last night', 'category': Complaint.Category.ELECTRICAL},
+            {'username': 'resident_casey', 'name': ('Casey', 'Allen'), 'email': 'casey.a@student.edu', 'id': 'BUET-ME-2022-003', 'course': 'Mechanical Engineering', 'room_idx': 2, 'ticket': 'Wifi is not working since past week, please fix it.', 'category': Complaint.Category.WIFI},
+            {'username': 'resident_tina', 'name': ('Tina', 'Harris'), 'email': 'tina.h@student.edu', 'id': 'JU-IIT-2023-004', 'course': 'Information Technology (B.Sc)', 'room_idx': 3, 'ticket': 'Laundry is not working properly, please look into this quickly', 'category': Complaint.Category.LAUNDRY},
+            {'username': 'resident_rick', 'name': ('Rick', 'Butcher'), 'email': 'rick.b@student.edu', 'id': 'SUST-SWE-2022-005', 'course': 'Software Engineering (B.Sc)', 'room_idx': 4, 'ticket': 'Hot water tap is broken, please fix it urgently', 'category': Complaint.Category.PLUMBING},
         ]
 
         occupied_beds_query = list(Bed.objects.filter(is_occupied=True)[:10])
@@ -152,7 +152,7 @@ class Command(BaseCommand):
                     'first_name': nr['name'][0],
                     'last_name': nr['name'][1],
                     'role': User.Role.RESIDENT,
-                    'phone_number': f'+91 98765 1000{idx+1}'
+                    'phone_number': f'+880 1712 1000{idx+1}'
                 }
             )
             user.set_password('demo1234')
@@ -165,12 +165,12 @@ class Command(BaseCommand):
                 defaults={
                     'student_id': nr['id'],
                     'course': nr['course'],
-                    'batch_year': '2023-2027',
+                    'batch_year': '2022-2026',
                     'gender': ResidentProfile.Gender.MALE if idx % 2 == 0 else ResidentProfile.Gender.FEMALE,
-                    'blood_group': 'O+' if idx % 2 == 0 else 'B+',
-                    'emergency_contact_name': f"Guardian of {nr['name'][0]}",
-                    'emergency_contact_phone': f'+91 98765 9900{idx+1}',
-                    'emergency_contact_relation': 'Parent',
+                    'blood_group': 'B+' if idx % 2 == 0 else 'O+',
+                    'emergency_contact_name': f"Md. Guardian of {nr['name'][0]}",
+                    'emergency_contact_phone': f'+880 1819 9900{idx+1}',
+                    'emergency_contact_relation': 'Parent / Guardian',
                     'status': ResidentProfile.Status.ACTIVE,
                     'admission_date': timezone.now().date() - timedelta(days=60),
                     'current_bed': assigned_bed
@@ -222,7 +222,7 @@ class Command(BaseCommand):
         VisitorLog.objects.all().delete()
         VisitorLog.objects.create(
             visitor_name='Arthur Ross',
-            visitor_phone='+91 98765 88101',
+            visitor_phone='+880 1711 881001',
             resident=created_residents[0][0],
             relationship='Father',
             destination='Building A | Floor 2nd | Room 201',
@@ -233,7 +233,7 @@ class Command(BaseCommand):
         )
         VisitorLog.objects.create(
             visitor_name='Sarah Grint',
-            visitor_phone='+91 98765 88102',
+            visitor_phone='+880 1819 881002',
             resident=created_residents[1][0],
             relationship='Mother',
             destination='Building A | Floor 1st | Room 103',
@@ -243,14 +243,13 @@ class Command(BaseCommand):
             recorded_by=warden_user
         )
 
-        # 8. Finance (Exact match to screenshot stats: Paid ₹ 1,20,345 & Unpaid ₹ 20,345)
+        # 8. Finance (Exact match to screenshot stats: Paid ৳ 1,20,345 & Unpaid ৳ 20,345)
+        Payment.objects.all().delete()
+        ResidentCharge.objects.all().delete()
         FeeCategory.objects.all().delete()
         rent_cat = FeeCategory.objects.create(name='Hostel Accommodation Rent', default_amount=Decimal('15000.00'), frequency=FeeCategory.Frequency.SEMESTER)
         mess_cat = FeeCategory.objects.create(name='Mess & Dining Dues', default_amount=Decimal('12000.00'), frequency=FeeCategory.Frequency.SEMESTER)
         caution_cat = FeeCategory.objects.create(name='Caution Deposit', default_amount=Decimal('5000.00'), frequency=FeeCategory.Frequency.ONE_TIME)
-
-        ResidentCharge.objects.all().delete()
-        Payment.objects.all().delete()
 
         # Unpaid Charge (₹ 20,345 exact match!)
         unpaid_charge = ResidentCharge.objects.create(
@@ -281,11 +280,11 @@ class Command(BaseCommand):
             amount=Decimal('120345.00'),
             payment_date=timezone.now().date() - timedelta(days=14),
             payment_method=Payment.PaymentMethod.BANK_TRANSFER,
-            transaction_reference='NEFT-SBIN20261023881',
+            transaction_reference='SONALI-DUC20261023881',
             status=Payment.Status.VERIFIED,
             recorded_by=accounts_user,
             verified_by=accounts_user,
-            notes='Full semester fees and caution deposit verified.'
+            notes='Full semester accommodation dues & hall caution deposit verified via Sonali Bank.'
         )
 
         # Operating Expenses
@@ -293,19 +292,19 @@ class Command(BaseCommand):
         HostelExpense.objects.create(
             category=HostelExpense.Category.UTILITIES,
             title='Monthly Electricity Grid Bill',
-            payee='State Power Distribution Corp',
+            payee='Dhaka Power Distribution Company (DPDC)',
             amount=Decimal('42500.00'),
             expense_date=timezone.now().date() - timedelta(days=5),
-            invoice_number='INV-PWR-9981',
+            invoice_number='INV-DPDC-9981',
             recorded_by=accounts_user
         )
         HostelExpense.objects.create(
             category=HostelExpense.Category.MESS_SUPPLIES,
             title='Bulk Provisions & Grocery Supply',
-            payee='Apex Wholesale Agro Ltd',
+            payee='Karwan Bazar Wholesale Agro Market',
             amount=Decimal('68200.00'),
             expense_date=timezone.now().date() - timedelta(days=8),
-            invoice_number='AGRO-8821',
+            invoice_number='KBZ-8821',
             recorded_by=accounts_user
         )
 

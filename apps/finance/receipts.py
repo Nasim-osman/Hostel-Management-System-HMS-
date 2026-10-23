@@ -104,15 +104,15 @@ def generate_receipt_pdf(payment):
     # Payment Item Breakdown Table
     charge_desc = payment.charge.description if payment.charge else "Hostel Fee Payment"
     items_data = [
-        [Paragraph("Description", bold_style), Paragraph("Payment Method", bold_style), Paragraph("Reference No", bold_style), Paragraph("Amount (₹)", bold_style)],
+        [Paragraph("Description", bold_style), Paragraph("Payment Method", bold_style), Paragraph("Reference No", bold_style), Paragraph("Amount (BDT)", bold_style)],
         [
             Paragraph(charge_desc, normal_style),
             Paragraph(payment.get_payment_method_display(), normal_style),
             Paragraph(payment.transaction_reference or "N/A", normal_style),
-            Paragraph(f"₹ {payment.amount:,.2f}", bold_style)
+            Paragraph(f"Tk. {payment.amount:,.2f}", bold_style)
         ],
         [
-            "", "", Paragraph("<b>Total Paid:</b>", bold_style), Paragraph(f"<b>₹ {payment.amount:,.2f}</b>", bold_style)
+            "", "", Paragraph("<b>Total Paid:</b>", bold_style), Paragraph(f"<b>Tk. {payment.amount:,.2f}</b>", bold_style)
         ]
     ]
 

@@ -106,7 +106,7 @@
                     <td>{{ room.capacity }} beds</td>
                     <td><span class="font-semibold text-green-700">{{ room.occupied_beds_count }}</span></td>
                     <td><span class="font-semibold {% if room.available_beds_count > 0 %}text-red-600{% else %}text-gray-400{% endif %}">{{ room.available_beds_count }}</span></td>
-                    <td>₹ {{ room.base_fee }}</td>
+                    <td>৳ {{ room.base_fee }}</td>
                     <td>
                         {% if room.is_full %}
                         <span class="badge badge-gray">Full</span>

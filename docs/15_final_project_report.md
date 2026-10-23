@@ -26,7 +26,7 @@ The interface adheres to the institutional aesthetic established in the referenc
 - Sidebar: `#1a2634` dark charcoal slate with vertical icon-and-label navigation.
 - 8-Card Dashboard Grid:
   1. **Rooms KPI:** Real-time 3-column breakdown (Total 200, Occupied 150, Vacant 50).
-  2. **Payment Summary:** Paid (₹ 1,20,345) vs Unpaid (₹ 20,345).
+  2. **Payment Summary:** Paid (৳ 1,20,345) vs Unpaid (৳ 20,345).
   3. **Amenities:** Live status ribbon for Light, Water, Wifi, Laundry, Hot Water.
   4. **Tenants Donut:** Circular progress ring (75% occupancy, 500 capacity, 375 occupied).
   5. **Mess (Today's Meal):** Breakfast (3 Idli Sambar), Lunch, and Dinner veg/non-veg menus.
