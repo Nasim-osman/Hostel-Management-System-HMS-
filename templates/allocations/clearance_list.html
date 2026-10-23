@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout & Clearance — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Hostel Checkout & Clearance</h1>
+            <p class="text-xs text-gray-500 mt-1">Multi-department institutional clearance workflow: Property &rarr; Accounts &rarr; Warden Final Approval.</p>
+        </div>
+        {% if request.user.is_resident %}
+        <a href="{% url 'allocations:request_clearance' %}" class="px-3 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+            + Request Checkout
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="hms-card p-0 overflow-hidden">
+        <table class="hms-table">
+            <thead>
+                <tr>
+                    <th>Ref #</th>
+                    <th>Resident ID</th>
+                    <th>Name</th>
+                    <th>Target Date</th>
+                    <th>Property Check</th>
+                    <th>Accounts Dues</th>
+                    <th>Warden Sign-Off</th>
+                    <th>Status</th>
+                    <th class="text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for clr in clearances %}
+                <tr>
+                    <td class="font-bold text-[#0060af]">#{{ clr.id }}</td>
+                    <td class="font-semibold">{{ clr.resident.student_id }}</td>
+                    <td>{{ clr.resident.user.get_full_name }}</td>
+                    <td>{{ clr.expected_checkout_date }}</td>
+                    <td>
+                        {% if clr.property_clearance %}
+                        <span class="text-xs font-semibold text-green-700 flex items-center">&check; Cleared</span>
+                        {% else %}
+                        {% if request.user.is_warden or request.user.is_admin_user or request.user.is_maintenance_staff %}
+                        <form method="POST" action="{% url 'allocations:approve_clearance_step' clr.id %}" class="inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="step" value="property">
+                            <button type="submit" class="px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] rounded hover:bg-blue-200">Approve Property</button>
+                        </form>
+                        {% else %}
+                        <span class="text-xs text-amber-600 font-medium">Pending</span>
+                        {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if clr.accounts_clearance %}
+                        <span class="text-xs font-semibold text-green-700 flex items-center">&check; No Dues</span>
+                        {% else %}
+                        {% if request.user.is_accounts_staff or request.user.is_admin_user %}
+                        <form method="POST" action="{% url 'allocations:approve_clearance_step' clr.id %}" class="inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="step" value="accounts">
+                            <button type="submit" class="px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] rounded hover:bg-blue-200">Clear Dues</button>
+                        </form>
+                        {% else %}
+                        <span class="text-xs text-amber-600 font-medium">Pending</span>
+                        {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if clr.warden_approval %}
+                        <span class="text-xs font-semibold text-green-700 flex items-center">&check; Approved</span>
+                        {% else %}
+                        {% if (request.user.is_warden or request.user.is_admin_user) and clr.property_clearance and clr.accounts_clearance %}
+                        <form method="POST" action="{% url 'allocations:approve_clearance_step' clr.id %}" class="inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="step" value="warden">
+                            <button type="submit" class="px-2 py-0.5 bg-green-700 text-white text-[10px] font-bold rounded hover:bg-green-800">Final Release</button>
+                        </form>
+                        {% else %}
+                        <span class="text-xs text-gray-400">Awaiting prior steps</span>
+                        {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if clr.status == 'COMPLETED' %}
+                        <span class="badge badge-success">Finalized</span>
+                        {% else %}
+                        <span class="badge badge-warning">{{ clr.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-right text-xs text-gray-500">
+                        {{ clr.clearance_notes|default:"-" }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center py-8 text-gray-400 text-xs">No active checkout clearance requests.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Room {{ room.room_number }} Details — HMS{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <a href="{% url 'rooms:room_list' %}" class="text-xs text-blue-600 hover:underline">&larr; Back to Rooms</a>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900 mt-1">{{ room.block.name }} &bull; Room {{ room.room_number }}</h1>
+        </div>
+        {% if request.user.is_warden or request.user.is_admin_user %}
+        <a href="{% url 'rooms:room_edit' room.id %}" class="px-3 py-1.5 bg-white border border-gray-300 text-xs font-semibold rounded text-gray-700 hover:bg-gray-50">
+            Edit Room
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Room Summary Card -->
+    <div class="hms-card">
+        <h2 class="hms-card-title">Room Specifications</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+            <div>
+                <span class="text-gray-400 block">Floor</span>
+                <span class="font-semibold text-gray-800 text-sm">Floor {{ room.floor }}</span>
+            </div>
+            <div>
+                <span class="text-gray-400 block">Room Type</span>
+                <span class="font-semibold text-gray-800 text-sm">{{ room.get_room_type_display }}</span>
+            </div>
+            <div>
+                <span class="text-gray-400 block">Capacity</span>
+                <span class="font-semibold text-gray-800 text-sm">{{ room.capacity }} Beds</span>
+            </div>
+            <div>
+                <span class="text-gray-400 block">Base Fee</span>
+                <span class="font-semibold text-gray-800 text-sm">₹ {{ room.base_fee }} / month</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Beds in this room -->
+    <div class="hms-card">
+        <h2 class="hms-card-title">Beds & Occupancy</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {% for item in beds_with_occupants %}
+            <div class="p-4 rounded-lg border {% if item.bed.is_occupied %}border-green-200 bg-green-50/40{% else %}border-gray-200 bg-white{% endif %} flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-bold text-sm text-gray-900">{{ item.bed.bed_number }}</span>
+                        {% if item.bed.is_occupied %}
+                        <span class="badge badge-success">Occupied</span>
+                        {% else %}
+                        <span class="badge badge-gray">Vacant</span>
+                        {% endif %}
+                    </div>
+
+                    {% if item.bed.current_resident %}
+                    <div class="text-xs space-y-1 mt-3">
+                        <div class="font-semibold text-gray-800">
+                            {{ item.bed.current_resident.user.get_full_name|default:item.bed.current_resident.student_id }}
+                        </div>
+                        <div class="text-gray-500">ID: {{ item.bed.current_resident.student_id }}</div>
+                        <div class="text-gray-500">{{ item.bed.current_resident.course }}</div>
+                    </div>
+                    {% else %}
+                    <div class="text-xs text-gray-400 italic mt-3">Ready for resident allocation</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Refunds — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Caution Deposit Refunds</h1>
+            <p class="text-xs text-gray-500 mt-1">Audit log of caution deposit disbursements and fee refunds upon clearance.</p>
+        </div>
+    </div>
+
+    <div class="hms-card p-0 overflow-hidden">
+        <table class="hms-table">
+            <thead>
+                <tr>
+                    <th>Ref #</th>
+                    <th>Resident</th>
+                    <th>Reason</th>
+                    <th>Amount</th>
+                    <th>Requested Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ref in refunds %}
+                <tr>
+                    <td class="font-bold text-[#0060af]">#{{ ref.id }}</td>
+                    <td class="font-semibold">{{ ref.resident.user.get_full_name }} ({{ ref.resident.student_id }})</td>
+                    <td>{{ ref.reason }}</td>
+                    <td class="font-bold text-green-700">₹ {{ ref.amount }}</td>
+                    <td>{{ ref.requested_date }}</td>
+                    <td>
+                        {% if ref.status == 'PROCESSED' %}
+                        <span class="badge badge-success">Processed</span>
+                        {% elif ref.status == 'APPROVED' %}
+                        <span class="badge badge-info">Approved</span>
+                        {% elif ref.status == 'REJECTED' %}
+                        <span class="badge badge-danger">Rejected</span>
+                        {% else %}
+                        <span class="badge badge-warning">Requested</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-8 text-gray-400 text-xs">No refund claims recorded.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

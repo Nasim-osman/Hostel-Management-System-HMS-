@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hostel Management — HMS{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto space-y-6">
+
+    <!-- Page Header Title matching screenshot -->
+    <div class="flex items-center justify-between pb-2">
+        <h1 class="text-2xl font-bold tracking-tight text-[#1e293b]">Hostel Management</h1>
+        <div class="flex items-center space-x-3 text-xs">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <span class="w-1.5 h-1.5 mr-1.5 bg-green-600 rounded-full"></span> System Live & Operational
+            </span>
+            <span class="text-gray-400">|</span>
+            <span class="text-gray-500 font-medium">Academic Year 2026-2027</span>
+        </div>
+    </div>
+
+    <!-- A/B Testing Variant B Banner (Controlled Experiment) -->
+    {% if user_variant == 'B' %}
+    <div class="bg-gradient-to-r from-blue-900 to-indigo-800 text-white rounded-lg p-4 shadow-md flex items-center justify-between transition-all" id="ab-variant-b-panel">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-blue-700/60 rounded-md">
+                <svg class="w-6 h-6 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            <div>
+                <div class="flex items-center space-x-2">
+                    <span class="font-bold text-sm">Prioritized Pending Actions</span>
+                    <span class="text-[10px] bg-amber-400 text-slate-900 font-bold px-1.5 py-0.5 rounded uppercase">Variant B Test</span>
+                </div>
+                <p class="text-xs text-blue-200 mt-0.5">
+                    {{ unsolved_count }} unsolved tickets require resolution &bull; Seat applications awaiting review.
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <a href="{% url 'complaints:complaint_list' %}" onclick="recordAbClick('CLICK_ACTION_ITEM')" class="px-3 py-1.5 bg-white text-blue-900 text-xs font-semibold rounded hover:bg-blue-50 transition shadow-sm">
+                Review Tickets
+            </a>
+            <a href="{% url 'allocations:application_list' %}" onclick="recordAbClick('CLICK_ACTION_ITEM')" class="px-3 py-1.5 bg-blue-700 text-white text-xs font-semibold rounded hover:bg-blue-600 transition">
+                Seat Applications
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Grid Container matching screenshot layout -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-5">
+
+        <!-- CARD 1: Rooms (Col span 4) -->
+        <div class="lg:col-span-4 hms-card">
+            <h2 class="hms-card-title">Rooms</h2>
+            <div class="grid grid-cols-3 text-center pt-2">
+                <div>
+                    <div class="stat-number-blue">{{ total_rooms }}</div>
+                    <div class="text-xs text-gray-500 font-medium mt-1">Total</div>
+                </div>
+                <div>
+                    <div class="stat-number-green">{{ occupied_rooms }}</div>
+                    <div class="text-xs text-gray-500 font-medium mt-1">Occupied</div>
+                </div>
+                <div>
+                    <div class="stat-number-red">{{ vacant_rooms }}</div>
+                    <div class="text-xs text-gray-500 font-medium mt-1">Vacant</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 2: Payment (Col span 4) -->
+        <div class="lg:col-span-4 hms-card">
+            <h2 class="hms-card-title">Payment</h2>
+            <div class="grid grid-cols-2 text-center pt-2">
+                <div>
+                    <div class="stat-number-green">₹ {{ total_paid|floatformat:0 }}</div>
+                    <div class="text-xs text-gray-500 font-medium mt-1">Paid</div>
+                </div>
+                <div>
+                    <div class="text-[26px] font-bold text-[#1e293b]">₹ {{ total_unpaid|floatformat:0 }}</div>
+                    <div class="text-xs text-gray-500 font-medium mt-1">Unpaid</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 3: Amenities (Col span 4) -->
+        <div class="lg:col-span-4 hms-card">
+            <h2 class="hms-card-title">Amenities</h2>
+            <div class="flex items-center justify-between pt-3 px-2">
+                <!-- Light -->
+                <div class="flex flex-col items-center">
+                    <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    </div>
+                    <span class="text-[11px] font-medium text-gray-700">Light</span>
+                </div>
+                <!-- Water -->
+                <div class="flex flex-col items-center">
+                    <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    </div>
+                    <span class="text-[11px] font-medium text-gray-700">Water</span>
+                </div>
+                <!-- Wifi -->
+                <div class="flex flex-col items-center">
+                    <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
+                    </div>
+                    <span class="text-[11px] font-medium text-gray-700">Wifi</span>
+                </div>
+                <!-- Laundry -->
+                <div class="flex flex-col items-center">
+                    <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    </div>
+                    <span class="text-[11px] font-medium text-gray-700">Laundry</span>
+                </div>
+                <!-- Hot Water -->
+                <div class="flex flex-col items-center">
+                    <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                    </div>
+                    <span class="text-[11px] font-medium text-gray-700">Hot Water</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 4: Tenants (Col span 4) -->
+        <div class="lg:col-span-4 hms-card">
+            <h2 class="hms-card-title">Tenants</h2>
+            <div class="flex items-center justify-between px-4 py-2">
+                <!-- Donut Chart -->
+                <div class="relative w-32 h-32 flex items-center justify-center">
+                    <canvas id="occupancyDonutChart" width="128" height="128"></canvas>
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <span class="text-xl font-bold text-gray-800">{{ occupancy_pct }} %</span>
+                    </div>
+                </div>
+                <!-- Stats on Right -->
+                <div class="space-y-4 pr-4">
+                    <div>
+                        <div class="text-xs text-gray-500 font-medium">Capacity</div>
+                        <div class="text-xl font-bold text-[#0060af]">{{ total_capacity }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 font-medium">Occupied</div>
+                        <div class="text-xl font-bold text-[#16a34a]">{{ occupied_beds }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 5: Mess (Today's Meal) (Col span 4) -->
+        <div class="lg:col-span-4 hms-card">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="hms-card-title mb-0">Mess</h2>
+                <span class="text-[11px] text-gray-400 font-medium">Today's Meal</span>
+            </div>
+            <div class="space-y-3 text-xs">
+                <!-- Breakfast -->
+                <div class="flex items-start">
+                    <span class="w-20 font-semibold text-gray-500">Breakfast</span>
+                    <span class="font-medium text-gray-800">{{ breakfast.veg_items|default:"3 Idli Sambar" }}</span>
+                </div>
+                <!-- Lunch -->
+                <div class="flex items-start">
+                    <span class="w-20 font-semibold text-gray-500 pt-0.5">Lunch</span>
+                    <div class="space-y-1">
+                        <div>
+                            <span class="font-bold text-green-700 mr-1.5">Veg</span>
+                            <span class="text-gray-700">{{ lunch.veg_items|default:"Sprouts | 3 Chapatis | Rice | Dal" }}</span>
+                        </div>
+                        <div>
+                            <span class="font-bold text-red-700 mr-1.5">Non-Veg</span>
+                            <span class="text-gray-700">{{ lunch.non_veg_items|default:"Egg Biryani" }}</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Dinner -->
+                <div class="flex items-start">
+                    <span class="w-20 font-semibold text-gray-500 pt-0.5">Dinner</span>
+                    <div class="space-y-1">
+                        <div>
+                            <span class="font-bold text-green-700 mr-1.5">Veg</span>
+                            <span class="text-gray-700">{{ dinner.veg_items|default:"Sprouts | 3 Chapatis | Rice | Dal" }}</span>
+                        </div>
+                        <div>
+                            <span class="font-bold text-red-700 mr-1.5">Non-Veg</span>
+                            <span class="text-gray-700">{{ dinner.non_veg_items|default:"Egg Curry | 3 Chapatis | Rice" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 6: Tickets (Col span 4) -->
+        <div class="lg:col-span-4 hms-card">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="hms-card-title mb-0">Tickets</h2>
+                <span class="text-[11px] text-gray-400 font-medium">Unsolved issues - {{ unsolved_count }}</span>
+            </div>
+            <div class="space-y-3">
+                {% for ticket in unsolved_tickets %}
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs flex-shrink-0">
+                        {{ ticket.resident.user.first_name|default:ticket.resident.user.username|make_list|first|upper }}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-xs font-semibold text-gray-900 truncate">
+                            {{ ticket.resident.user.get_full_name|default:ticket.resident.student_id }}
+                        </div>
+                        <div class="text-[11px] text-gray-500 truncate">{{ ticket.title }}</div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-slate-300 text-slate-800 font-bold flex items-center justify-center text-xs flex-shrink-0">M</div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-xs font-semibold text-gray-900">Mike Ross</div>
+                        <div class="text-[11px] text-gray-500">Water not Comming</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-slate-300 text-slate-800 font-bold flex items-center justify-center text-xs flex-shrink-0">J</div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-xs font-semibold text-gray-900">Jennifer Grint</div>
+                        <div class="text-[11px] text-gray-500">Light is not available since last night</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-slate-300 text-slate-800 font-bold flex items-center justify-center text-xs flex-shrink-0">C</div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-xs font-semibold text-gray-900">Casey Allen</div>
+                        <div class="text-[11px] text-gray-500">Wifi is not working since past week, please fix it.</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-slate-300 text-slate-800 font-bold flex items-center justify-center text-xs flex-shrink-0">T</div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-xs font-semibold text-gray-900">Tina Harris</div>
+                        <div class="text-[11px] text-gray-500">Laundry is not working properly, please look into this quickly</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-slate-300 text-slate-800 font-bold flex items-center justify-center text-xs flex-shrink-0">R</div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-xs font-semibold text-gray-900">Rick Butcher</div>
+                        <div class="text-[11px] text-gray-500">Hot water tap is broken, please fix it urgently</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- CARD 7: Visitors (Col span 6) -->
+        <div class="lg:col-span-6 hms-card">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="hms-card-title mb-0">Visitors</h2>
+                <span class="text-[11px] text-gray-400 font-medium">Total {{ total_active_visitors }}</span>
+            </div>
+            <div class="space-y-3 pt-1">
+                {% for vis in active_visitors %}
+                <div class="text-sm font-semibold text-gray-700 bg-gray-50 p-2.5 rounded border border-gray-100 flex items-center justify-between">
+                    <span>{{ vis.destination }}</span>
+                    <span class="text-xs text-gray-500 font-normal">({{ vis.visitor_name }})</span>
+                </div>
+                {% empty %}
+                <div class="text-sm font-semibold text-gray-700 bg-gray-50 p-2.5 rounded border border-gray-100">
+                    Building A | Floor 2nd | Room 201
+                </div>
+                <div class="text-sm font-semibold text-gray-700 bg-gray-50 p-2.5 rounded border border-gray-100">
+                    Building A | Floor 1st | Room 103
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- CARD 8: Reports (Col span 6) -->
+        <div class="lg:col-span-6 hms-card">
+            <h2 class="hms-card-title">Reports</h2>
+            <div class="space-y-3 pt-1">
+                <a href="{% url 'rooms:room_list' %}?availability=vacant" class="text-sm font-semibold text-gray-700 bg-gray-50 p-2.5 rounded border border-gray-100 flex items-center justify-between hover:bg-gray-100 transition">
+                    <span>Total Number of Vacant Room</span>
+                    <span class="text-sm font-bold text-red-600">{{ vacant_rooms }}</span>
+                </a>
+                <a href="{% url 'finance:payment_list' %}" class="text-sm font-semibold text-gray-700 bg-gray-50 p-2.5 rounded border border-gray-100 flex items-center justify-between hover:bg-gray-100 transition">
+                    <span>Total Fees Collected</span>
+                    <span class="text-sm font-bold text-green-700">₹ {{ total_paid|floatformat:0 }}</span>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Initialize Donut Chart matching screenshot
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById('occupancyDonutChart').getContext('2d');
+        const occupied = {{ occupied_beds|default:375 }};
+        const capacity = {{ total_capacity|default:500 }};
+        const vacant = Math.max(0, capacity - occupied);
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [occupied, vacant],
+                    backgroundColor: ['#16a34a', '#e2e8f0'],
+                    borderWidth: 0,
+                    cutout: '76%'
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: { enabled: false }
+                }
+            }
+        });
+    });
+
+    function recordAbClick(eventName) {
+        fetch("{% url 'abtesting:track_metric' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: new URLSearchParams({ 'event_name': eventName })
+        }).catch(err => console.log(err));
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Outpass Requests — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Resident Outpass & Leave Passes</h1>
+            <p class="text-xs text-gray-500 mt-1">Leave requests, expected return timestamps, overdue tracking, and emergency parent contacts.</p>
+        </div>
+        {% if request.user.is_resident %}
+        <a href="{% url 'attendance:request_outpass' %}" class="px-3 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+            + Request Outpass
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="hms-card p-0 overflow-hidden">
+        <table class="hms-table">
+            <thead>
+                <tr>
+                    <th>Ref #</th>
+                    <th>Resident</th>
+                    <th>Purpose</th>
+                    <th>Destination</th>
+                    <th>Departure</th>
+                    <th>Expected Return</th>
+                    <th>Parent Phone</th>
+                    <th>Status</th>
+                    <th class="text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for op in outpasses %}
+                <tr>
+                    <td class="font-bold text-[#0060af]">#{{ op.id }}</td>
+                    <td>
+                        <div class="font-semibold text-gray-900">{{ op.resident.user.get_full_name }}</div>
+                        <div class="text-[11px] text-gray-400">ID: {{ op.resident.student_id }}</div>
+                    </td>
+                    <td>{{ op.purpose }}</td>
+                    <td class="text-xs text-gray-600 max-w-xs truncate">{{ op.destination_address }}</td>
+                    <td>{{ op.departure_time|date:"M d, H:i" }}</td>
+                    <td>{{ op.expected_return_time|date:"M d, H:i" }}</td>
+                    <td>{{ op.parent_contact }}</td>
+                    <td>
+                        {% if op.status == 'RETURNED' %}
+                        <span class="badge badge-success">Returned</span>
+                        {% elif op.status == 'OVERDUE' %}
+                        <span class="badge badge-danger">Overdue Return</span>
+                        {% elif op.status == 'DEPARTED' %}
+                        <span class="badge badge-info">Departed</span>
+                        {% elif op.status == 'APPROVED' %}
+                        <span class="badge badge-success">Approved</span>
+                        {% elif op.status == 'REJECTED' %}
+                        <span class="badge badge-gray">Rejected</span>
+                        {% else %}
+                        <span class="badge badge-warning">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-right space-x-1">
+                        {% if request.user.is_warden or request.user.is_admin_user %}
+                            {% if op.status == 'PENDING' %}
+                            <form method="POST" action="{% url 'attendance:approve_outpass' op.id %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" name="action" value="approve" class="px-2 py-0.5 bg-green-700 text-white text-[10px] rounded hover:bg-green-800">Approve</button>
+                                <button type="submit" name="action" value="reject" class="px-2 py-0.5 bg-red-600 text-white text-[10px] rounded hover:bg-red-700">Reject</button>
+                            </form>
+                            {% elif op.status == 'APPROVED' %}
+                            <form method="POST" action="{% url 'attendance:approve_outpass' op.id %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" name="action" value="depart" class="px-2 py-0.5 bg-blue-600 text-white text-[10px] rounded hover:bg-blue-700">Mark Departed</button>
+                            </form>
+                            {% elif op.status == 'DEPARTED' or op.status == 'OVERDUE' %}
+                            <form method="POST" action="{% url 'attendance:approve_outpass' op.id %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" name="action" value="return" class="px-2 py-0.5 bg-green-700 text-white text-[10px] rounded hover:bg-green-800">Mark Returned</button>
+                            </form>
+                            {% else %}
+                            <span class="text-xs text-gray-400">-</span>
+                            {% endif %}
+                        {% else %}
+                        <span class="text-xs text-gray-400">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center py-8 text-gray-400 text-xs">No outpass requests logged.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

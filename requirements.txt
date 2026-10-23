@@ -1,0 +1,7 @@
+Django>=5.0.0,<5.1.0
+python-dotenv>=1.0.0
+reportlab>=4.0.0
+Pillow>=10.0.0
+pytest>=8.0.0
+pytest-django>=4.8.0
+psycopg2-binary>=2.9.9; sys_platform == 'linux' or sys_platform == 'darwin' or sys_platform == 'win32'

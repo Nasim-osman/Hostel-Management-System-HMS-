@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Rooms & Beds — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Hostel Rooms & Beds</h1>
+            <p class="text-xs text-gray-500 mt-1">Manage rooms, floor assignments, and occupancy capacity.</p>
+        </div>
+        {% if request.user.is_warden or request.user.is_admin_user %}
+        <div class="flex items-center space-x-2">
+            <a href="{% url 'reports:export_csv' 'rooms' %}" class="px-3 py-2 bg-white border border-gray-300 text-xs font-semibold rounded text-gray-700 hover:bg-gray-50 transition">
+                Export CSV
+            </a>
+            <a href="{% url 'rooms:room_create' %}" class="px-3 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded transition shadow-sm">
+                + Add Room
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Quick Metrics -->
+    <div class="grid grid-cols-4 gap-4">
+        <div class="hms-card py-3">
+            <div class="text-xs text-gray-500">Total Rooms</div>
+            <div class="text-xl font-bold text-gray-900">{{ total_rooms }}</div>
+        </div>
+        <div class="hms-card py-3">
+            <div class="text-xs text-gray-500">Total Bed Capacity</div>
+            <div class="text-xl font-bold text-[#0060af]">{{ total_beds }}</div>
+        </div>
+        <div class="hms-card py-3">
+            <div class="text-xs text-gray-500">Occupied Beds</div>
+            <div class="text-xl font-bold text-green-600">{{ occupied_beds }}</div>
+        </div>
+        <div class="hms-card py-3">
+            <div class="text-xs text-gray-500">Vacant Beds</div>
+            <div class="text-xl font-bold text-red-600">{{ vacant_beds }}</div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="hms-card p-4">
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Hostel Block</label>
+                <select name="block" class="form-select text-xs">
+                    <option value="">All Blocks</option>
+                    {% for b in blocks %}
+                    <option value="{{ b.id }}" {% if selected_block == b.id|stringformat:"s" %}selected{% endif %}>{{ b.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Room Type</label>
+                <select name="type" class="form-select text-xs">
+                    <option value="">All Types</option>
+                    {% for val, label in room_types %}
+                    <option value="{{ val }}" {% if selected_type == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Availability</label>
+                <select name="availability" class="form-select text-xs">
+                    <option value="">All Statuses</option>
+                    <option value="vacant" {% if selected_availability == 'vacant' %}selected{% endif %}>Has Vacant Beds</option>
+                    <option value="occupied" {% if selected_availability == 'occupied' %}selected{% endif %}>Occupied</option>
+                </select>
+            </div>
+            <div class="flex items-end space-x-2">
+                <button type="submit" class="flex-1 px-4 py-2 bg-[#0060af] text-white text-xs font-semibold rounded hover:bg-[#005096] transition">
+                    Filter
+                </button>
+                <a href="{% url 'rooms:room_list' %}" class="px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded hover:bg-gray-200 transition">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Rooms Table -->
+    <div class="hms-card p-0 overflow-hidden">
+        <table class="hms-table">
+            <thead>
+                <tr>
+                    <th>Room</th>
+                    <th>Block & Floor</th>
+                    <th>Type</th>
+                    <th>Capacity</th>
+                    <th>Occupied</th>
+                    <th>Available</th>
+                    <th>Monthly Fee</th>
+                    <th>Status</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for room in rooms %}
+                <tr>
+                    <td class="font-bold text-gray-900">Room {{ room.room_number }}</td>
+                    <td>{{ room.block.name }} &bull; Floor {{ room.floor }}</td>
+                    <td>{{ room.get_room_type_display }}</td>
+                    <td>{{ room.capacity }} beds</td>
+                    <td><span class="font-semibold text-green-700">{{ room.occupied_beds_count }}</span></td>
+                    <td><span class="font-semibold {% if room.available_beds_count > 0 %}text-red-600{% else %}text-gray-400{% endif %}">{{ room.available_beds_count }}</span></td>
+                    <td>₹ {{ room.base_fee }}</td>
+                    <td>
+                        {% if room.is_full %}
+                        <span class="badge badge-gray">Full</span>
+                        {% else %}
+                        <span class="badge badge-success">Available</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-right space-x-2">
+                        <a href="{% url 'rooms:room_detail' room.id %}" class="text-xs text-[#0060af] font-semibold hover:underline">View Beds</a>
+                        {% if request.user.is_warden or request.user.is_admin_user %}
+                        <a href="{% url 'rooms:room_edit' room.id %}" class="text-xs text-gray-500 hover:text-gray-800">Edit</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center py-8 text-gray-400 text-xs">No rooms found matching the criteria.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

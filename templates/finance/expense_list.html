@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Hostel Expenses — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Hostel Operating Expenses</h1>
+            <p class="text-xs text-gray-500 mt-1">Track institutional operational overheads, mess supplies, utilities, and repairs.</p>
+        </div>
+        {% if request.user.is_accounts_staff or request.user.is_admin_user %}
+        <div class="flex items-center space-x-2">
+            <a href="{% url 'reports:export_csv' 'expenses' %}" class="px-3 py-2 bg-white border border-gray-300 text-xs font-semibold rounded text-gray-700 hover:bg-gray-50">
+                Export CSV
+            </a>
+            <a href="{% url 'finance:add_expense' %}" class="px-3 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+                + Add Expense
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Total banner -->
+    <div class="hms-card py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between">
+        <div>
+            <div class="text-xs text-gray-400">Total Recorded Operational Expenditure</div>
+            <div class="text-2xl font-bold text-white mt-0.5">₹ {{ total_amount|floatformat:2 }}</div>
+        </div>
+        <div class="text-xs text-gray-400">Audited Institutionally</div>
+    </div>
+
+    <!-- Expense Table -->
+    <div class="hms-card p-0 overflow-hidden">
+        <table class="hms-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Title</th>
+                    <th>Payee / Vendor</th>
+                    <th>Amount</th>
+                    <th>Invoice / Voucher</th>
+                    <th>Recorded By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exp in expenses %}
+                <tr>
+                    <td>{{ exp.expense_date }}</td>
+                    <td><span class="badge badge-info">{{ exp.get_category_display }}</span></td>
+                    <td class="font-bold text-gray-900">{{ exp.title }}</td>
+                    <td>{{ exp.payee }}</td>
+                    <td class="font-bold text-slate-900">₹ {{ exp.amount }}</td>
+                    <td>{{ exp.invoice_number|default:"-" }}</td>
+                    <td class="text-xs text-gray-500">{{ exp.recorded_by.get_full_name|default:exp.recorded_by.username }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-8 text-gray-400 text-xs">No expenses logged.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

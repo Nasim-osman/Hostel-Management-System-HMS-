@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Seat Applications — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Seat Applications & Allocation</h1>
+            <p class="text-xs text-gray-500 mt-1">Review student applications, manage queue priorities, and allocate beds.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <a href="{% url 'allocations:waiting_list' %}" class="px-3 py-2 bg-white border border-gray-300 text-xs font-semibold rounded text-gray-700 hover:bg-gray-50">
+                Waiting List
+            </a>
+            {% if request.user.is_resident %}
+            <a href="{% url 'allocations:apply_seat' %}" class="px-3 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+                Apply for Seat
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Application Table -->
+    <div class="hms-card p-0 overflow-hidden">
+        <table class="hms-table">
+            <thead>
+                <tr>
+                    <th>Ref #</th>
+                    <th>Applicant Name</th>
+                    <th>Resident ID</th>
+                    <th>Preferred Type</th>
+                    <th>Preferred Block</th>
+                    <th>Applied Date</th>
+                    <th>Status</th>
+                    <th class="text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr>
+                    <td class="font-bold text-[#0060af]">#{{ app.id }}</td>
+                    <td class="font-semibold text-gray-900">{{ app.resident.user.get_full_name|default:app.resident.student_id }}</td>
+                    <td>{{ app.resident.student_id }}</td>
+                    <td>{{ app.get_preferred_room_type_display }}</td>
+                    <td>{{ app.preferred_block.name|default:"Any" }}</td>
+                    <td>{{ app.applied_at|date:"M d, Y" }}</td>
+                    <td>
+                        {% if app.status == 'ALLOCATED' %}
+                        <span class="badge badge-success">Allocated</span>
+                        {% elif app.status == 'APPROVED' %}
+                        <span class="badge badge-info">Approved</span>
+                        {% elif app.status == 'WAITLISTED' %}
+                        <span class="badge badge-warning">Waitlisted</span>
+                        {% elif app.status == 'REJECTED' %}
+                        <span class="badge badge-danger">Rejected</span>
+                        {% else %}
+                        <span class="badge badge-gray">Pending Review</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-right space-x-2">
+                        {% if request.user.is_warden or request.user.is_admin_user %}
+                            {% if app.status == 'PENDING' %}
+                            <a href="{% url 'allocations:review_application' app.id %}" class="text-xs text-blue-600 font-semibold hover:underline">Review &rarr;</a>
+                            {% elif app.status == 'APPROVED' %}
+                            <a href="{% url 'allocations:allocate_bed' app.id %}" class="text-xs text-green-700 font-semibold hover:underline">Allocate Bed &rarr;</a>
+                            {% else %}
+                            <span class="text-xs text-gray-400">Processed</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-xs text-gray-400">View</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center py-8 text-gray-400 text-xs">No seat applications found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results: "{{ query }}" — HMS{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight text-gray-900">Search Results</h1>
+        <p class="text-xs text-gray-500 mt-1">Showing search matches for query: <span class="font-bold text-[#0060af]">"{{ query }}"</span></p>
+    </div>
+
+    <!-- Results Categories -->
+    {% if residents %}
+    <div class="hms-card">
+        <h2 class="hms-card-title">Matching Residents ({{ residents|length }})</h2>
+        <div class="space-y-2">
+            {% for r in residents %}
+            <div class="p-2.5 rounded bg-gray-50 flex items-center justify-between text-xs">
+                <div>
+                    <span class="font-bold text-[#0060af] mr-2">{{ r.student_id }}</span>
+                    <span class="font-semibold text-gray-900">{{ r.user.get_full_name }}</span>
+                    <span class="text-gray-500 ml-2">({{ r.course }})</span>
+                </div>
+                <a href="{% url 'residents:resident_detail' r.id %}" class="text-xs text-blue-600 font-bold hover:underline">View Profile &rarr;</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if rooms %}
+    <div class="hms-card">
+        <h2 class="hms-card-title">Matching Rooms ({{ rooms|length }})</h2>
+        <div class="space-y-2">
+            {% for rm in rooms %}
+            <div class="p-2.5 rounded bg-gray-50 flex items-center justify-between text-xs">
+                <div>
+                    <span class="font-bold text-gray-900 mr-2">{{ rm.block.name }} &bull; Room {{ rm.room_number }}</span>
+                    <span class="text-gray-500">Floor {{ rm.floor }} &bull; {{ rm.get_room_type_display }}</span>
+                </div>
+                <a href="{% url 'rooms:room_detail' rm.id %}" class="text-xs text-blue-600 font-bold hover:underline">View Room &rarr;</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if complaints %}
+    <div class="hms-card">
+        <h2 class="hms-card-title">Matching Tickets ({{ complaints|length }})</h2>
+        <div class="space-y-2">
+            {% for c in complaints %}
+            <div class="p-2.5 rounded bg-gray-50 flex items-center justify-between text-xs">
+                <div>
+                    <span class="font-bold text-[#0060af] mr-2">{{ c.ticket_number }}</span>
+                    <span class="font-semibold text-gray-900">{{ c.title }}</span>
+                    <span class="badge badge-info ml-2">{{ c.get_status_display }}</span>
+                </div>
+                <a href="{% url 'complaints:complaint_detail' c.id %}" class="text-xs text-blue-600 font-bold hover:underline">View Ticket &rarr;</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not residents and not rooms and not complaints and not notices %}
+    <div class="hms-card text-center py-12 text-gray-400 text-xs">
+        No records matched your search query. Try searching by resident name, student ID, room number, or ticket number.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

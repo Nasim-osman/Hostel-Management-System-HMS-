@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Payments & Receipts — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Hostel Payments & Receipts</h1>
+            <p class="text-xs text-gray-500 mt-1">Audit log of all verified fee transactions and downloadable official receipts.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+            {% if request.user.is_accounts_staff or request.user.is_admin_user %}
+            <a href="{% url 'finance:record_payment' %}" class="px-3 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+                + Record Payment
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="hms-card p-0 overflow-hidden">
+        <table class="hms-table">
+            <thead>
+                <tr>
+                    <th>Receipt No</th>
+                    <th>Resident</th>
+                    <th>Fee Description</th>
+                    <th>Amount</th>
+                    <th>Payment Date</th>
+                    <th>Method</th>
+                    <th>Reference</th>
+                    <th>Status</th>
+                    <th class="text-right">Receipt</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td class="font-bold text-[#0060af]">{{ p.receipt_number }}</td>
+                    <td>
+                        <div class="font-semibold text-gray-900">{{ p.resident.user.get_full_name }}</div>
+                        <div class="text-[11px] text-gray-400">ID: {{ p.resident.student_id }}</div>
+                    </td>
+                    <td>{{ p.charge.description|default:"General Hostel Payment" }}</td>
+                    <td class="font-bold text-green-700">₹ {{ p.amount }}</td>
+                    <td>{{ p.payment_date }}</td>
+                    <td>{{ p.get_payment_method_display }}</td>
+                    <td class="text-xs text-gray-500">{{ p.transaction_reference|default:"-" }}</td>
+                    <td>
+                        {% if p.status == 'VERIFIED' %}
+                        <span class="badge badge-success">Verified</span>
+                        {% elif p.status == 'REJECTED' %}
+                        <span class="badge badge-danger">Rejected</span>
+                        {% else %}
+                        <span class="badge badge-warning">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-right space-x-2">
+                        {% if p.status == 'VERIFIED' %}
+                        <a href="{% url 'finance:download_receipt' p.receipt_number %}" class="inline-flex items-center px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded transition">
+                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            PDF
+                        </a>
+                        {% elif (request.user.is_accounts_staff or request.user.is_admin_user) and p.status == 'PENDING' %}
+                        <form method="POST" action="{% url 'finance:verify_payment' p.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" name="action" value="verify" class="px-2 py-1 bg-green-700 text-white text-[10px] font-bold rounded hover:bg-green-800">
+                                Verify
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center py-8 text-gray-400 text-xs">No payment records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Accounts & Financial Management — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Financial Management & Accounts</h1>
+            <p class="text-xs text-gray-500 mt-1">Fee collection, verified receipts, outstanding balances, fines, refunds, and operating expenses.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <a href="{% url 'reports:export_csv' 'payments' %}" class="px-3 py-2 bg-white border border-gray-300 text-xs font-semibold rounded text-gray-700 hover:bg-gray-50">
+                Export Payments CSV
+            </a>
+            <a href="{% url 'finance:record_payment' %}" class="px-3 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+                + Record Payment
+            </a>
+            <a href="{% url 'finance:add_expense' %}" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded shadow-sm">
+                + Add Expense
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Financial Stat Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="hms-card py-3">
+            <div class="text-xs text-gray-500 font-medium">Total Fees Collected</div>
+            <div class="text-2xl font-bold text-green-700 mt-1">₹ {{ total_paid|floatformat:0 }}</div>
+        </div>
+        <div class="hms-card py-3">
+            <div class="text-xs text-gray-500 font-medium">Outstanding Dues</div>
+            <div class="text-2xl font-bold text-red-600 mt-1">₹ {{ total_unpaid|floatformat:0 }}</div>
+        </div>
+        <div class="hms-card py-3">
+            <div class="text-xs text-gray-500 font-medium">Operating Expenses</div>
+            <div class="text-2xl font-bold text-slate-800 mt-1">₹ {{ total_expenses|floatformat:0 }}</div>
+        </div>
+        <div class="hms-card py-3">
+            <div class="text-xs text-gray-500 font-medium">Penalties & Fines</div>
+            <div class="text-2xl font-bold text-amber-600 mt-1">₹ {{ total_fines|floatformat:0 }}</div>
+        </div>
+        <div class="hms-card py-3">
+            <div class="text-xs text-gray-500 font-medium">Pending Verifications</div>
+            <div class="text-2xl font-bold text-blue-600 mt-1">{{ pending_payments_count }}</div>
+        </div>
+    </div>
+
+    <!-- Tables Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <!-- Recent Verified Payments -->
+        <div class="hms-card">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="hms-card-title mb-0">Recent Payment Receipts</h2>
+                <a href="{% url 'finance:payment_list' %}" class="text-xs text-blue-600 hover:underline">View All</a>
+            </div>
+            <div class="space-y-2.5">
+                {% for p in recent_payments %}
+                <div class="p-3 rounded border border-gray-100 bg-gray-50 flex items-center justify-between text-xs">
+                    <div>
+                        <div class="font-bold text-[#0060af]">{{ p.receipt_number }}</div>
+                        <div class="text-gray-800">{{ p.resident.user.get_full_name }} ({{ p.resident.student_id }})</div>
+                        <div class="text-[10px] text-gray-400">{{ p.payment_date }} &bull; {{ p.get_payment_method_display }}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-bold text-green-700">₹ {{ p.amount }}</div>
+                        <a href="{% url 'finance:download_receipt' p.receipt_number %}" class="text-[11px] text-blue-600 font-semibold hover:underline">
+                            Download PDF
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-xs text-gray-400 italic py-4 text-center">No payment records yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recent Operating Expenses -->
+        <div class="hms-card">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="hms-card-title mb-0">Recent Hostel Expenses</h2>
+                <a href="{% url 'finance:expense_list' %}" class="text-xs text-blue-600 hover:underline">View All</a>
+            </div>
+            <div class="space-y-2.5">
+                {% for e in recent_expenses %}
+                <div class="p-3 rounded border border-gray-100 bg-gray-50 flex items-center justify-between text-xs">
+                    <div>
+                        <div class="font-bold text-gray-900">{{ e.title }}</div>
+                        <div class="text-[11px] text-gray-600">Payee: {{ e.payee }} &bull; {{ e.get_category_display }}</div>
+                        <div class="text-[10px] text-gray-400">{{ e.expense_date }}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-bold text-slate-900">₹ {{ e.amount }}</div>
+                        <span class="text-[10px] text-gray-400">{{ e.invoice_number|default:"No invoice" }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-xs text-gray-400 italic py-4 text-center">No expenses logged.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

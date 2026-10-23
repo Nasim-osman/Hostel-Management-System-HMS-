@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Maintenance Tickets — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Maintenance & Complaints (Tickets)</h1>
+            <p class="text-xs text-gray-500 mt-1">Track resident facility complaints, maintenance staff assignments, and resolutions.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <a href="{% url 'reports:export_csv' 'complaints' %}" class="px-3 py-2 bg-white border border-gray-300 text-xs font-semibold rounded text-gray-700 hover:bg-gray-50">
+                Export CSV
+            </a>
+            {% if request.user.is_resident %}
+            <a href="{% url 'complaints:submit_complaint' %}" class="px-3 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+                + Submit Complaint
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="hms-card p-4">
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
+                <select name="status" class="form-select text-xs">
+                    <option value="">All Statuses</option>
+                    {% for val, label in status_choices %}
+                    <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Category</label>
+                <select name="category" class="form-select text-xs">
+                    <option value="">All Categories</option>
+                    {% for val, label in category_choices %}
+                    <option value="{{ val }}" {% if selected_category == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Priority</label>
+                <select name="priority" class="form-select text-xs">
+                    <option value="">All Priorities</option>
+                    {% for val, label in priority_choices %}
+                    <option value="{{ val }}" {% if selected_priority == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex items-end space-x-2">
+                <button type="submit" class="flex-1 px-4 py-2 bg-[#0060af] text-white text-xs font-semibold rounded hover:bg-[#005096]">
+                    Filter
+                </button>
+                <a href="{% url 'complaints:complaint_list' %}" class="px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded hover:bg-gray-200">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tickets Table -->
+    <div class="hms-card p-0 overflow-hidden">
+        <table class="hms-table">
+            <thead>
+                <tr>
+                    <th>Ticket #</th>
+                    <th>Issue Title</th>
+                    <th>Resident</th>
+                    <th>Room</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Assigned To</th>
+                    <th>Status</th>
+                    <th class="text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in complaints %}
+                <tr>
+                    <td class="font-bold text-[#0060af]">{{ ticket.ticket_number }}</td>
+                    <td>
+                        <div class="font-semibold text-gray-900">{{ ticket.title }}</div>
+                        <div class="text-[10px] text-gray-400">{{ ticket.created_at|date:"M d, Y H:i" }}</div>
+                    </td>
+                    <td>{{ ticket.resident.user.get_full_name }}</td>
+                    <td>{{ ticket.room|default:"-" }}</td>
+                    <td><span class="badge badge-info">{{ ticket.get_category_display }}</span></td>
+                    <td>
+                        {% if ticket.priority == 'URGENT' %}
+                        <span class="badge badge-danger">Urgent</span>
+                        {% elif ticket.priority == 'HIGH' %}
+                        <span class="badge badge-warning">High</span>
+                        {% else %}
+                        <span class="badge badge-gray">{{ ticket.get_priority_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if ticket.assigned_to %}
+                        <span class="font-medium text-gray-800">{{ ticket.assigned_to.get_full_name }}</span>
+                        {% else %}
+                        <span class="text-xs text-amber-600 font-semibold italic">Unassigned</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if ticket.status == 'RESOLVED' or ticket.status == 'CLOSED' %}
+                        <span class="badge badge-success">{{ ticket.get_status_display }}</span>
+                        {% elif ticket.status == 'IN_PROGRESS' %}
+                        <span class="badge badge-warning">In Progress</span>
+                        {% else %}
+                        <span class="badge badge-info">{{ ticket.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-right">
+                        <a href="{% url 'complaints:complaint_detail' ticket.id %}" class="text-xs text-blue-600 font-bold hover:underline">
+                            View &rarr;
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="text-center py-8 text-gray-400 text-xs">No maintenance complaints found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

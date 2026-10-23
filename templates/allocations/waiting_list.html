@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Seat Waiting List — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Seat Waiting List Queue</h1>
+            <p class="text-xs text-gray-500 mt-1">Priority-ordered waiting list for students seeking hostel accommodation.</p>
+        </div>
+        <a href="{% url 'allocations:application_list' %}" class="text-xs text-blue-600 hover:underline">
+            &larr; Back to Applications
+        </a>
+    </div>
+
+    <div class="hms-card p-0 overflow-hidden">
+        <table class="hms-table">
+            <thead>
+                <tr>
+                    <th>Priority #</th>
+                    <th>Resident ID</th>
+                    <th>Applicant Name</th>
+                    <th>Course</th>
+                    <th>Preferred Room</th>
+                    <th>Queue Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                <tr>
+                    <td class="font-bold text-center text-[#0060af]">
+                        <span class="inline-block w-6 h-6 rounded-full bg-blue-100 text-[#0060af] leading-6 text-xs">
+                            {{ entry.priority_number }}
+                        </span>
+                    </td>
+                    <td class="font-semibold">{{ entry.application.resident.student_id }}</td>
+                    <td>{{ entry.application.resident.user.get_full_name }}</td>
+                    <td>{{ entry.application.resident.course }}</td>
+                    <td>{{ entry.application.get_preferred_room_type_display }}</td>
+                    <td>{{ entry.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <span class="badge badge-warning">{{ entry.get_status_display }}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-8 text-gray-400 text-xs">The seat waiting list queue is currently empty.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

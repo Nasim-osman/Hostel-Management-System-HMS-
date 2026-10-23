@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Fines & Penalties — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Hostel Fines & Penalties</h1>
+            <p class="text-xs text-gray-500 mt-1">Disciplinary, property damage, and late-return penalties.</p>
+        </div>
+        {% if request.user.is_warden or request.user.is_admin_user or request.user.is_accounts_staff %}
+        <a href="{% url 'finance:issue_fine' %}" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded shadow-sm">
+            + Issue Fine
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="hms-card p-0 overflow-hidden">
+        <table class="hms-table">
+            <thead>
+                <tr>
+                    <th>Ref #</th>
+                    <th>Resident</th>
+                    <th>Reason / Violation</th>
+                    <th>Amount</th>
+                    <th>Issued Date</th>
+                    <th>Issued By</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fine in fines %}
+                <tr>
+                    <td class="font-bold text-[#0060af]">#{{ fine.id }}</td>
+                    <td class="font-semibold">{{ fine.resident.user.get_full_name }} ({{ fine.resident.student_id }})</td>
+                    <td>{{ fine.reason }}</td>
+                    <td class="font-bold text-red-600">₹ {{ fine.amount }}</td>
+                    <td>{{ fine.issued_date }}</td>
+                    <td>{{ fine.issued_by.get_full_name|default:fine.issued_by.username }}</td>
+                    <td>
+                        {% if fine.status == 'PAID' %}
+                        <span class="badge badge-success">Paid</span>
+                        {% elif fine.status == 'WAIVED' %}
+                        <span class="badge badge-gray">Waived</span>
+                        {% else %}
+                        <span class="badge badge-danger">Pending</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-8 text-gray-400 text-xs">No fines on record.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

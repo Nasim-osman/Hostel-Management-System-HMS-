@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Hostel Amenities Status — HMS{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Amenities & Facility Status</h1>
+            <p class="text-xs text-gray-500 mt-1">Live status of hostel infrastructure utilities (Light, Water, Wifi, Laundry, Hot Water).</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for amenity in amenities %}
+        <div class="hms-card p-5 flex items-start justify-between">
+            <div class="space-y-1">
+                <div class="flex items-center space-x-2">
+                    <span class="font-bold text-gray-900 text-base">{{ amenity.name }}</span>
+                    {% if amenity.status == 'OPERATIONAL' %}
+                    <span class="badge badge-success">Operational</span>
+                    {% elif amenity.status == 'DEGRADED' %}
+                    <span class="badge badge-warning">Minor Issue</span>
+                    {% else %}
+                    <span class="badge badge-danger">Outage / In Maintenance</span>
+                    {% endif %}
+                </div>
+                <p class="text-xs text-gray-500">{{ amenity.description|default:"All facility checks normal." }}</p>
+                <div class="text-[10px] text-gray-400 pt-2">Last inspected: {{ amenity.last_inspected|date:"M d, Y H:i" }}</div>
+            </div>
+
+            {% if request.user.is_staff_member %}
+            <form method="POST" action="{% url 'rooms:amenity_toggle' amenity.id %}" class="flex flex-col space-y-2">
+                {% csrf_token %}
+                <select name="status" class="text-xs border rounded p-1">
+                    <option value="OPERATIONAL" {% if amenity.status == 'OPERATIONAL' %}selected{% endif %}>Operational</option>
+                    <option value="DEGRADED" {% if amenity.status == 'DEGRADED' %}selected{% endif %}>Minor Issue</option>
+                    <option value="OUTAGE" {% if amenity.status == 'OUTAGE' %}selected{% endif %}>Outage</option>
+                </select>
+                <button type="submit" class="px-2.5 py-1 bg-slate-800 text-white text-[11px] rounded hover:bg-slate-700">
+                    Update
+                </button>
+            </form>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

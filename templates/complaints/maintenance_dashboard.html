@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Maintenance Staff Dashboard — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Maintenance Work Orders</h1>
+            <p class="text-xs text-gray-500 mt-1">Logged tickets assigned to your maintenance team for repairs and facility operations.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <span class="badge badge-warning text-sm py-1 px-3">{{ open_count }} Open Tasks</span>
+            <span class="badge badge-success text-sm py-1 px-3">{{ resolved_count }} Resolved</span>
+        </div>
+    </div>
+
+    <!-- Assigned Tickets Table -->
+    <div class="hms-card p-0 overflow-hidden">
+        <table class="hms-table">
+            <thead>
+                <tr>
+                    <th>Ticket #</th>
+                    <th>Issue Title</th>
+                    <th>Location / Room</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th class="text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in assigned_tickets %}
+                <tr>
+                    <td class="font-bold text-[#0060af]">{{ ticket.ticket_number }}</td>
+                    <td>
+                        <div class="font-semibold text-gray-900">{{ ticket.title }}</div>
+                        <div class="text-[10px] text-gray-400">By: {{ ticket.resident.user.get_full_name }} &bull; {{ ticket.created_at|date:"M d, H:i" }}</div>
+                    </td>
+                    <td><span class="font-bold text-gray-800">{{ ticket.room|default:"Hostel Facility" }}</span></td>
+                    <td><span class="badge badge-info">{{ ticket.get_category_display }}</span></td>
+                    <td>
+                        {% if ticket.priority == 'URGENT' %}
+                        <span class="badge badge-danger">Urgent</span>
+                        {% elif ticket.priority == 'HIGH' %}
+                        <span class="badge badge-warning">High</span>
+                        {% else %}
+                        <span class="badge badge-gray">{{ ticket.get_priority_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if ticket.status == 'RESOLVED' or ticket.status == 'CLOSED' %}
+                        <span class="badge badge-success">{{ ticket.get_status_display }}</span>
+                        {% else %}
+                        <span class="badge badge-warning">{{ ticket.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-right">
+                        <a href="{% url 'complaints:complaint_detail' ticket.id %}" class="px-2.5 py-1 bg-[#0060af] text-white text-xs font-semibold rounded hover:bg-[#005096]">
+                            Update &rarr;
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-8 text-gray-400 text-xs">No active maintenance tasks assigned to you. All clear!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

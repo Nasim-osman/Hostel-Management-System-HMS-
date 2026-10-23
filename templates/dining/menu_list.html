@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Mess & Dining Menu — HMS{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Hostel Mess & Dining Service</h1>
+            <p class="text-xs text-gray-500 mt-1">Daily scheduled nutritional meals, vegetarian/non-vegetarian options, and feedback.</p>
+        </div>
+        {% if request.user.is_resident %}
+        <a href="{% url 'dining:submit_feedback' %}" class="px-3 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+            Give Meal Feedback
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Meal Cards matching dashboard style -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {% for meal in meals %}
+        <div class="hms-card flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-2">
+                    <h2 class="hms-card-title mb-0">{{ meal.get_meal_type_display }}</h2>
+                    <span class="text-xs text-gray-400">{{ meal.timing|default:"Regular Hours" }}</span>
+                </div>
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <span class="font-bold text-green-700 block mb-0.5">Vegetarian Menu</span>
+                        <p class="text-gray-800 bg-green-50/60 p-2 rounded border border-green-100">{{ meal.veg_items }}</p>
+                    </div>
+                    {% if meal.non_veg_items %}
+                    <div>
+                        <span class="font-bold text-red-700 block mb-0.5">Non-Vegetarian Special</span>
+                        <p class="text-gray-800 bg-red-50/60 p-2 rounded border border-red-100">{{ meal.non_veg_items }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if request.user.is_warden or request.user.is_admin_user %}
+            <div class="pt-4 mt-4 border-t border-gray-100 text-right">
+                <a href="{% url 'dining:edit_menu' meal.id %}" class="text-xs text-blue-600 font-semibold hover:underline">
+                    Edit Menu &rarr;
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="col-span-3 text-center py-10 text-gray-400 text-xs">
+            No meal schedules configured.
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Recent Resident Feedbacks -->
+    <div class="hms-card">
+        <h2 class="hms-card-title">Recent Resident Dining Feedback</h2>
+        <div class="space-y-2">
+            {% for fb in feedbacks %}
+            <div class="p-3 rounded border border-gray-100 bg-gray-50 flex items-center justify-between text-xs">
+                <div>
+                    <div class="font-semibold text-gray-900">{{ fb.resident.user.get_full_name }} &bull; {{ fb.meal_type }}</div>
+                    <div class="text-gray-600 mt-0.5">{{ fb.comments|default:"No specific comments." }}</div>
+                </div>
+                <div class="text-right">
+                    <span class="font-bold text-amber-500 text-sm">★ {{ fb.rating }}/5</span>
+                    <div class="text-[10px] text-gray-400">{{ fb.created_at }}</div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-xs text-gray-400 italic">No feedback entries yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

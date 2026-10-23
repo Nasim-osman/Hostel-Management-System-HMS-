@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}A/B Testing Experiment Dashboard — HMS{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">A/B Testing Experiment Analytics</h1>
+            <p class="text-xs text-gray-500 mt-1">Controlled UI experiment evaluating user engagement on the Hostel Management Dashboard.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                <span class="w-1.5 h-1.5 mr-1.5 bg-green-600 rounded-full animate-pulse"></span> Experiment Active
+            </span>
+        </div>
+    </div>
+
+    <!-- Hypothesis and Experiment Setup Details -->
+    <div class="hms-card bg-slate-900 text-white space-y-3">
+        <div class="flex items-center justify-between">
+            <span class="text-xs uppercase tracking-wider text-blue-400 font-bold">Experiment: {{ experiment.code }}</span>
+            <span class="text-xs text-gray-400">Total Assigned Participants: {{ total_participants }}</span>
+        </div>
+        <h2 class="text-lg font-bold text-white">{{ experiment.name }}</h2>
+        <div class="p-3 bg-slate-800/80 rounded border border-slate-700 text-xs text-gray-200">
+            <span class="font-bold text-amber-300">Hypothesis:</span> {{ experiment.hypothesis }}
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-xs">
+            <div>
+                <span class="text-gray-400 block">Primary Metric</span>
+                <span class="font-semibold text-white">{{ experiment.primary_metric }}</span>
+            </div>
+            <div>
+                <span class="text-gray-400 block">Assignment Strategy</span>
+                <span class="font-semibold text-white">Deterministic Modulo Hashing (50/50 split)</span>
+            </div>
+            <div>
+                <span class="text-gray-400 block">Decision Rule</span>
+                <span class="font-semibold text-white">p &lt; 0.05 and relative lift &gt; 15%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Variant Comparison Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Variant A -->
+        <div class="hms-card border-t-4 border-t-slate-400 space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-base text-gray-900">Variant A</h3>
+                    <span class="text-xs text-gray-500">Standard Dashboard Layout</span>
+                </div>
+                <span class="badge badge-gray">Control</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center pt-2">
+                <div class="p-3 bg-gray-50 rounded">
+                    <div class="text-xl font-bold text-gray-900">{{ views_a }}</div>
+                    <div class="text-[11px] text-gray-500">Impressions</div>
+                </div>
+                <div class="p-3 bg-gray-50 rounded">
+                    <div class="text-xl font-bold text-gray-900">{{ clicks_a }}</div>
+                    <div class="text-[11px] text-gray-500">Action Clicks</div>
+                </div>
+                <div class="p-3 bg-gray-50 rounded">
+                    <div class="text-xl font-bold text-[#0060af]">{{ ctr_a }}%</div>
+                    <div class="text-[11px] text-gray-500">CTR</div>
+                </div>
+            </div>
+            <p class="text-xs text-gray-600 bg-gray-50 p-2.5 rounded">
+                Users navigate via normal grid cards and sidebar navigation to locate urgent pending tickets and approvals.
+            </p>
+        </div>
+
+        <!-- Variant B -->
+        <div class="hms-card border-t-4 border-t-[#0060af] space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-base text-gray-900">Variant B</h3>
+                    <span class="text-xs text-gray-500">Prioritized Urgent Actions Banner</span>
+                </div>
+                <span class="badge badge-success">Treatment</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center pt-2">
+                <div class="p-3 bg-blue-50/50 rounded">
+                    <div class="text-xl font-bold text-gray-900">{{ views_b }}</div>
+                    <div class="text-[11px] text-gray-500">Impressions</div>
+                </div>
+                <div class="p-3 bg-blue-50/50 rounded">
+                    <div class="text-xl font-bold text-gray-900">{{ clicks_b }}</div>
+                    <div class="text-[11px] text-gray-500">Action Clicks</div>
+                </div>
+                <div class="p-3 bg-blue-50/50 rounded">
+                    <div class="text-xl font-bold text-green-700">{{ ctr_b }}%</div>
+                    <div class="text-[11px] text-gray-500">CTR</div>
+                </div>
+            </div>
+            <p class="text-xs text-gray-600 bg-blue-50/40 p-2.5 rounded">
+                Features a prominent top-level alert panel directing wardens directly to unassigned tickets and seat reviews with 1-click actions.
+            </p>
+        </div>
+    </div>
+
+    <!-- Comparative Analysis -->
+    <div class="hms-card space-y-4">
+        <h2 class="hms-card-title">Statistical Lift & Outcome Analysis</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="p-4 bg-gray-50 rounded border border-gray-100">
+                <div class="text-xs text-gray-500 font-medium">Absolute CTR Difference</div>
+                <div class="text-2xl font-bold text-gray-900 mt-1">{% if improvement >= 0 %}+{% endif %}{{ improvement }}%</div>
+            </div>
+            <div class="p-4 bg-green-50 rounded border border-green-200">
+                <div class="text-xs text-green-800 font-medium">Observed Relative Lift</div>
+                <div class="text-2xl font-bold text-green-700 mt-1">{% if relative_lift >= 0 %}+{% endif %}{{ relative_lift }}%</div>
+            </div>
+            <div class="p-4 bg-blue-50 rounded border border-blue-200">
+                <div class="text-xs text-blue-800 font-medium">Current Evaluation Verdict</div>
+                <div class="text-sm font-bold text-[#0060af] mt-2">
+                    {% if relative_lift > 15 %}
+                    Variant B demonstrates strong positive engagement lift.
+                    {% else %}
+                    Data accumulating; trending toward Variant B.
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

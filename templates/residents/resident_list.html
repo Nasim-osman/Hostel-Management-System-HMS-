@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Residents / Tenants — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Hostel Residents (Tenants)</h1>
+            <p class="text-xs text-gray-500 mt-1">Manage student profiles, emergency records, room assignments, and statuses.</p>
+        </div>
+        {% if request.user.is_warden or request.user.is_admin_user %}
+        <div class="flex items-center space-x-2">
+            <a href="{% url 'reports:export_csv' 'residents' %}" class="px-3 py-2 bg-white border border-gray-300 text-xs font-semibold rounded text-gray-700 hover:bg-gray-50">
+                Export CSV
+            </a>
+            <a href="{% url 'residents:resident_create' %}" class="px-3 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+                + Register Resident
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Quick stats -->
+    <div class="grid grid-cols-3 gap-4">
+        <div class="hms-card py-3">
+            <div class="text-xs text-gray-500">Total Registered</div>
+            <div class="text-xl font-bold text-gray-900">{{ total_residents }}</div>
+        </div>
+        <div class="hms-card py-3">
+            <div class="text-xs text-gray-500">Active Occupants</div>
+            <div class="text-xl font-bold text-green-600">{{ active_count }}</div>
+        </div>
+        <div class="hms-card py-3">
+            <div class="text-xs text-gray-500">Pending Applicants</div>
+            <div class="text-xl font-bold text-[#0060af]">{{ applicant_count }}</div>
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="hms-card p-4">
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
+                <select name="status" class="form-select text-xs">
+                    <option value="">All Statuses</option>
+                    {% for val, label in status_choices %}
+                    <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Gender</label>
+                <select name="gender" class="form-select text-xs">
+                    <option value="">All Genders</option>
+                    <option value="MALE" {% if selected_gender == 'MALE' %}selected{% endif %}>Male</option>
+                    <option value="FEMALE" {% if selected_gender == 'FEMALE' %}selected{% endif %}>Female</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Search ID or Name</label>
+                <input type="text" name="q" value="{{ search_q|default:'' }}" placeholder="e.g. Mike Ross or HMS-RES..." class="form-input text-xs">
+            </div>
+            <div class="flex items-end space-x-2">
+                <button type="submit" class="flex-1 px-4 py-2 bg-[#0060af] text-white text-xs font-semibold rounded hover:bg-[#005096]">
+                    Search
+                </button>
+                <a href="{% url 'residents:resident_list' %}" class="px-3 py-2 bg-gray-100 text-gray-700 text-xs font-medium rounded hover:bg-gray-200">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Resident Table -->
+    <div class="hms-card p-0 overflow-hidden">
+        <table class="hms-table">
+            <thead>
+                <tr>
+                    <th>Resident ID</th>
+                    <th>Name</th>
+                    <th>Course / Batch</th>
+                    <th>Assigned Bed</th>
+                    <th>Emergency Contact</th>
+                    <th>Status</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in residents %}
+                <tr>
+                    <td class="font-bold text-[#0060af]">{{ res.student_id }}</td>
+                    <td>
+                        <div class="font-semibold text-gray-900">{{ res.user.get_full_name|default:res.user.username }}</div>
+                        <div class="text-[11px] text-gray-400">{{ res.user.email }}</div>
+                    </td>
+                    <td>
+                        <div>{{ res.course|default:"N/A" }}</div>
+                        <div class="text-[11px] text-gray-400">{{ res.batch_year }}</div>
+                    </td>
+                    <td>
+                        {% if res.current_bed %}
+                        <span class="font-semibold text-gray-800">{{ res.current_bed.room.block.name }} &bull; Rm {{ res.current_bed.room.room_number }} ({{ res.current_bed.bed_number }})</span>
+                        {% else %}
+                        <span class="text-xs text-gray-400 italic">None (Unassigned)</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="text-xs text-gray-700">{{ res.emergency_contact_name|default:"-" }}</div>
+                        <div class="text-[11px] text-gray-400">{{ res.emergency_contact_phone }}</div>
+                    </td>
+                    <td>
+                        {% if res.status == 'ACTIVE' %}
+                        <span class="badge badge-success">Active</span>
+                        {% elif res.status == 'APPLICANT' %}
+                        <span class="badge badge-info">Applicant</span>
+                        {% elif res.status == 'CHECKED_OUT' %}
+                        <span class="badge badge-gray">Checked Out</span>
+                        {% else %}
+                        <span class="badge badge-danger">{{ res.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-right space-x-2">
+                        <a href="{% url 'residents:resident_detail' res.id %}" class="text-xs text-[#0060af] font-semibold hover:underline">View</a>
+                        {% if request.user.is_warden or request.user.is_admin_user %}
+                        <a href="{% url 'residents:resident_edit' res.id %}" class="text-xs text-gray-500 hover:text-gray-800">Edit</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-8 text-gray-400 text-xs">No resident profiles found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

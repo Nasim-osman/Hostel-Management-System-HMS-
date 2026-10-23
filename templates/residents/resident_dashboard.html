@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Resident Portal — HMS{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-6">
+    <!-- Welcome Header -->
+    <div class="flex items-center justify-between pb-2">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">
+                Welcome, {{ request.user.first_name|default:request.user.username }}
+            </h1>
+            <p class="text-xs text-gray-500 mt-0.5">
+                Resident Portal &bull; ID: <span class="font-bold text-[#0060af]">{{ resident.student_id }}</span>
+            </p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <a href="{% url 'complaints:submit_complaint' %}" class="px-3 py-1.5 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+                + Log Ticket
+            </a>
+            <a href="{% url 'attendance:request_outpass' %}" class="px-3 py-1.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded shadow-sm">
+                Request Outpass
+            </a>
+        </div>
+    </div>
+
+    <!-- Top Status Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- Room Info -->
+        <div class="hms-card flex flex-col justify-between">
+            <div>
+                <h2 class="hms-card-title">My Assigned Room</h2>
+                {% if resident.current_bed %}
+                <div class="space-y-1">
+                    <div class="text-xl font-bold text-[#0060af]">{{ resident.current_bed.room.block.name }}</div>
+                    <div class="text-base font-semibold text-gray-800">Room {{ resident.current_bed.room.room_number }} &bull; {{ resident.current_bed.bed_number }}</div>
+                    <div class="text-xs text-gray-500">Floor {{ resident.current_bed.room.floor }} &bull; {{ resident.current_bed.room.get_room_type_display }}</div>
+                </div>
+                {% else %}
+                <div class="py-4 text-xs text-gray-500">
+                    You do not have an active allocated bed yet.
+                    <a href="{% url 'allocations:apply_seat' %}" class="block mt-2 font-bold text-blue-600 hover:underline">Apply for Seat &rarr;</a>
+                </div>
+                {% endif %}
+            </div>
+            {% if resident.current_bed %}
+            <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
+                <a href="{% url 'allocations:request_transfer' %}" class="text-xs text-blue-600 font-medium hover:underline">Request Room Transfer</a>
+                <a href="{% url 'allocations:request_clearance' %}" class="text-xs text-gray-500 hover:underline">Checkout Clearance</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Fee Balance -->
+        <div class="hms-card flex flex-col justify-between">
+            <div>
+                <h2 class="hms-card-title">Hostel Fee Balance</h2>
+                <div class="pt-1">
+                    <div class="text-2xl font-bold {% if balance_due > 0 %}text-red-600{% else %}text-green-700{% endif %}">
+                        ₹ {{ balance_due }}
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">Total Paid to Date: ₹ {{ total_paid }}</div>
+                </div>
+            </div>
+            <div class="pt-3 border-t border-gray-100">
+                <a href="{% url 'finance:payment_list' %}" class="text-xs text-[#0060af] font-semibold hover:underline">View Invoices & Receipts &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Today's Mess Quick View -->
+        <div class="hms-card">
+            <h2 class="hms-card-title">Today's Mess Menu</h2>
+            <div class="space-y-2 text-xs">
+                <div>
+                    <span class="font-bold text-gray-600">Lunch:</span>
+                    <span class="text-gray-800">Sprouts | 3 Chapatis | Rice | Dal</span>
+                </div>
+                <div>
+                    <span class="font-bold text-gray-600">Dinner:</span>
+                    <span class="text-gray-800">Egg Curry | 3 Chapatis | Rice</span>
+                </div>
+                <div class="pt-2">
+                    <a href="{% url 'dining:meal_menu' %}" class="text-xs text-blue-600 font-medium hover:underline">Full Weekly Menu & Feedback &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Tickets & Outpasses -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- My Complaints -->
+        <div class="hms-card">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="hms-card-title mb-0">My Maintenance Tickets</h2>
+                <a href="{% url 'complaints:complaint_list' %}" class="text-xs text-blue-600 hover:underline">View All</a>
+            </div>
+            <div class="space-y-2.5">
+                {% for ticket in complaints %}
+                <div class="p-3 rounded border border-gray-100 bg-gray-50 flex items-center justify-between text-xs">
+                    <div>
+                        <div class="font-semibold text-gray-900">{{ ticket.title }}</div>
+                        <div class="text-[10px] text-gray-400">Ref: {{ ticket.ticket_number }} &bull; {{ ticket.created_at|date:"M d, Y" }}</div>
+                    </div>
+                    <span class="badge {% if ticket.status == 'RESOLVED' or ticket.status == 'CLOSED' %}badge-success{% elif ticket.status == 'IN_PROGRESS' %}badge-warning{% else %}badge-info{% endif %}">
+                        {{ ticket.get_status_display }}
+                    </span>
+                </div>
+                {% empty %}
+                <p class="text-xs text-gray-400 italic py-4 text-center">No complaints logged.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- My Outpasses -->
+        <div class="hms-card">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="hms-card-title mb-0">My Outpass Passes</h2>
+                <a href="{% url 'attendance:outpass_list' %}" class="text-xs text-blue-600 hover:underline">View All</a>
+            </div>
+            <div class="space-y-2.5">
+                {% for op in outpasses %}
+                <div class="p-3 rounded border border-gray-100 bg-gray-50 flex items-center justify-between text-xs">
+                    <div>
+                        <div class="font-semibold text-gray-900">{{ op.purpose }}</div>
+                        <div class="text-[10px] text-gray-400">Depart: {{ op.departure_time|date:"M d, H:i" }} &bull; Return: {{ op.expected_return_time|date:"M d, H:i" }}</div>
+                    </div>
+                    <span class="badge {% if op.status == 'APPROVED' %}badge-success{% elif op.status == 'REJECTED' or op.status == 'OVERDUE' %}badge-danger{% else %}badge-warning{% endif %}">
+                        {{ op.get_status_display }}
+                    </span>
+                </div>
+                {% empty %}
+                <p class="text-xs text-gray-400 italic py-4 text-center">No outpass requests submitted.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Official Notices -->
+    <div class="hms-card">
+        <h2 class="hms-card-title">Hostel Announcements</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {% for notice in recent_notices %}
+            <div class="p-3 rounded border border-gray-100 bg-white shadow-sm space-y-1">
+                <div class="flex items-center justify-between text-[11px]">
+                    <span class="badge badge-info">{{ notice.get_category_display }}</span>
+                    <span class="text-gray-400">{{ notice.publish_date|date:"M d, Y" }}</span>
+                </div>
+                <div class="font-bold text-sm text-gray-900">{{ notice.title }}</div>
+                <p class="text-xs text-gray-600 line-clamp-2">{{ notice.content }}</p>
+            </div>
+            {% empty %}
+            <p class="text-xs text-gray-400 italic">No announcements posted.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

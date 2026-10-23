@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Record Payment — HMS{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto space-y-6">
+    <div>
+        <a href="{% url 'finance:payment_list' %}" class="text-xs text-blue-600 hover:underline">&larr; Back to Payments</a>
+        <h1 class="text-2xl font-bold tracking-tight text-gray-900 mt-1">Record Resident Payment</h1>
+        <p class="text-xs text-gray-500">Record and issue official verified receipt for hostel fees, mess bills, or caution deposits.</p>
+    </div>
+
+    <div class="hms-card">
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Resident</label>
+                {{ form.resident }}
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Link to Unpaid Charge (Optional)</label>
+                {{ form.charge }}
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Amount Paid (₹)</label>
+                    {{ form.amount }}
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Payment Date</label>
+                    {{ form.payment_date }}
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Payment Method</label>
+                    {{ form.payment_method }}
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Transaction Ref / Cheque No</label>
+                    {{ form.transaction_reference }}
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-700 mb-1">Notes / Remarks</label>
+                {{ form.notes }}
+            </div>
+
+            <div class="pt-4 border-t border-gray-100 flex items-center justify-end space-x-2">
+                <a href="{% url 'finance:payment_list' %}" class="px-4 py-2 border border-gray-300 rounded text-xs font-medium text-gray-700 hover:bg-gray-50">Cancel</a>
+                <button type="submit" class="px-4 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+                    Record & Issue Receipt
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

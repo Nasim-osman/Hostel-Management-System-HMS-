@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Room Transfers — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Room Transfer Requests</h1>
+            <p class="text-xs text-gray-500 mt-1">Review, approve, and execute room and bed reassignments.</p>
+        </div>
+        {% if request.user.is_resident %}
+        <a href="{% url 'allocations:request_transfer' %}" class="px-3 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+            + Request Transfer
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="hms-card p-0 overflow-hidden">
+        <table class="hms-table">
+            <thead>
+                <tr>
+                    <th>Ref #</th>
+                    <th>Resident ID</th>
+                    <th>Name</th>
+                    <th>Current Bed</th>
+                    <th>Target Room</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th class="text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tr in transfers %}
+                <tr>
+                    <td class="font-bold text-[#0060af]">#{{ tr.id }}</td>
+                    <td class="font-semibold">{{ tr.resident.student_id }}</td>
+                    <td>{{ tr.resident.user.get_full_name }}</td>
+                    <td>{{ tr.current_bed }}</td>
+                    <td>{{ tr.target_room|default:"Any suitable room" }}</td>
+                    <td class="text-xs text-gray-600 max-w-xs truncate">{{ tr.reason }}</td>
+                    <td>
+                        {% if tr.status == 'COMPLETED' %}
+                        <span class="badge badge-success">Completed</span>
+                        {% elif tr.status == 'REJECTED' %}
+                        <span class="badge badge-danger">Rejected</span>
+                        {% else %}
+                        <span class="badge badge-warning">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-right">
+                        {% if (request.user.is_warden or request.user.is_admin_user) and tr.status == 'PENDING' %}
+                        <a href="{% url 'allocations:process_transfer' tr.id %}" class="text-xs text-blue-600 font-semibold hover:underline">
+                            Process &rarr;
+                        </a>
+                        {% else %}
+                        <span class="text-xs text-gray-400">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center py-8 text-gray-400 text-xs">No room transfer requests recorded.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

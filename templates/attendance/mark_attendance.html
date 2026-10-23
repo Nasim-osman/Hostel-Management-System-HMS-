@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Mark Attendance — HMS{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <a href="{% url 'attendance:attendance_overview' %}" class="text-xs text-blue-600 hover:underline">&larr; Back to Attendance</a>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900 mt-1">Mark Roll-Call Attendance</h1>
+            <p class="text-xs text-gray-500">Date: {{ today|date:"F d, Y" }}</p>
+        </div>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="hms-card p-0 overflow-hidden mb-4">
+            <table class="hms-table">
+                <thead>
+                    <tr>
+                        <th>Resident ID</th>
+                        <th>Name</th>
+                        <th>Room / Bed</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for res in residents %}
+                    <tr>
+                        <td class="font-bold text-[#0060af]">{{ res.student_id }}</td>
+                        <td class="font-semibold">{{ res.user.get_full_name }}</td>
+                        <td>{{ res.current_bed|default:"No Bed" }}</td>
+                        <td>
+                            <select name="status_{{ res.id }}" class="text-xs border rounded p-1 bg-white">
+                                <option value="PRESENT" selected>Present</option>
+                                <option value="ABSENT">Absent</option>
+                                <option value="LEAVE">On Leave</option>
+                                <option value="OUTPASS">On Outpass</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="remarks_{{ res.id }}" placeholder="Optional notes" class="text-xs border rounded px-2 py-1 w-full">
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-8 text-gray-400 text-xs">No active residents to mark.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex justify-end space-x-2">
+            <a href="{% url 'attendance:attendance_overview' %}" class="px-4 py-2 border border-gray-300 rounded text-xs font-medium text-gray-700 hover:bg-gray-50">Cancel</a>
+            <button type="submit" class="px-5 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+                Save Roll Call Attendance
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

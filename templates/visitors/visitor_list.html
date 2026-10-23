@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Visitor Management — HMS{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">Hostel Visitor Records</h1>
+            <p class="text-xs text-gray-500 mt-1">Register campus visitors, track check-in and check-out timestamps, and issue security gate passes.</p>
+        </div>
+        {% if request.user.is_warden or request.user.is_admin_user %}
+        <div class="flex items-center space-x-2">
+            <a href="{% url 'reports:export_csv' 'visitors' %}" class="px-3 py-2 bg-white border border-gray-300 text-xs font-semibold rounded text-gray-700 hover:bg-gray-50">
+                Export CSV
+            </a>
+            <a href="{% url 'visitors:check_in' %}" class="px-3 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+                + Check In Visitor
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Active Visitors Banner -->
+    <div class="hms-card py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            <span class="text-sm font-semibold text-gray-800">Currently Active In Hostel: <span class="text-[#0060af] font-bold">{{ active_count }}</span> visitors</span>
+        </div>
+        <span class="text-xs text-gray-400">Institutional Security Gate Control</span>
+    </div>
+
+    <!-- Visitor Table -->
+    <div class="hms-card p-0 overflow-hidden">
+        <table class="hms-table">
+            <thead>
+                <tr>
+                    <th>Gate Pass</th>
+                    <th>Visitor Name</th>
+                    <th>Contact Phone</th>
+                    <th>Host Resident</th>
+                    <th>Destination Room</th>
+                    <th>Purpose</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Status</th>
+                    <th class="text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vis in visitors %}
+                <tr>
+                    <td class="font-bold text-[#0060af]">{{ vis.gate_pass_no|default:"GP-REG" }}</td>
+                    <td class="font-semibold text-gray-900">{{ vis.visitor_name }}</td>
+                    <td>{{ vis.visitor_phone }}</td>
+                    <td>{{ vis.resident.user.get_full_name }} ({{ vis.resident.student_id }})</td>
+                    <td class="font-semibold text-gray-800">{{ vis.destination }}</td>
+                    <td class="text-xs text-gray-600">{{ vis.purpose }}</td>
+                    <td>{{ vis.check_in_time|date:"M d, H:i" }}</td>
+                    <td>{{ vis.check_out_time|date:"M d, H:i"|default:"-" }}</td>
+                    <td>
+                        {% if vis.status == 'CHECKED_IN' %}
+                        <span class="badge badge-success">Active</span>
+                        {% else %}
+                        <span class="badge badge-gray">Checked Out</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-right">
+                        {% if (request.user.is_warden or request.user.is_admin_user) and vis.status == 'CHECKED_IN' %}
+                        <form method="POST" action="{% url 'visitors:check_out' vis.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-semibold rounded">
+                                Check Out
+                            </button>
+                        </form>
+                        {% else %}
+                        <span class="text-xs text-gray-400">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="text-center py-8 text-gray-400 text-xs">No visitor logs recorded.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

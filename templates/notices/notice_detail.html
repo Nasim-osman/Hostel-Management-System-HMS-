@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ notice.title }} — HMS{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <a href="{% url 'notices:notice_list' %}" class="text-xs text-blue-600 hover:underline">&larr; Back to Notices</a>
+        {% if request.user.is_warden or request.user.is_admin_user %}
+        <a href="{% url 'notices:notice_edit' notice.id %}" class="px-3 py-1 bg-white border border-gray-300 rounded text-xs font-semibold text-gray-700 hover:bg-gray-50">
+            Edit Notice
+        </a>
+        {% endif %}
+    </div>
+
+    <article class="hms-card space-y-4 p-8">
+        <div class="flex items-center space-x-2 text-xs">
+            <span class="badge badge-info">{{ notice.get_category_display }}</span>
+            <span class="text-gray-400">&bull;</span>
+            <span class="text-gray-500">Published on {{ notice.publish_date|date:"F d, Y" }}</span>
+            <span class="text-gray-400">&bull;</span>
+            <span class="text-gray-500">Target: {{ notice.get_target_audience_display }}</span>
+        </div>
+
+        <h1 class="text-2xl font-bold tracking-tight text-gray-900 leading-tight">
+            {{ notice.title }}
+        </h1>
+
+        <div class="pt-4 border-t border-gray-100 text-sm text-gray-800 leading-relaxed space-y-3 whitespace-pre-line">
+            {{ notice.content }}
+        </div>
+
+        <div class="pt-6 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
+            <span>Official Circular &bull; HMS Administration</span>
+            <span>Issued by {{ notice.created_by.get_full_name|default:notice.created_by.username }}</span>
+        </div>
+    </article>
+</div>
+{% endblock %}
