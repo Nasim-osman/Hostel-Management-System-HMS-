@@ -49,10 +49,14 @@
                         {% endif %}
                     </td>
                     <td class="text-right">
-                        {% if (request.user.is_warden or request.user.is_admin_user) and tr.status == 'PENDING' %}
-                        <a href="{% url 'allocations:process_transfer' tr.id %}" class="text-xs text-blue-600 font-semibold hover:underline">
-                            Process &rarr;
-                        </a>
+                        {% if tr.status == 'PENDING' %}
+                            {% if request.user.is_warden or request.user.is_admin_user %}
+                            <a href="{% url 'allocations:process_transfer' tr.id %}" class="text-xs text-blue-600 font-semibold hover:underline">
+                                Process &rarr;
+                            </a>
+                            {% else %}
+                            <span class="text-xs text-amber-600 font-medium">Pending Review</span>
+                            {% endif %}
                         {% else %}
                         <span class="text-xs text-gray-400">-</span>
                         {% endif %}

@@ -59,10 +59,14 @@
                         {% endif %}
                     </td>
                     <td class="text-right">
-                        {% if (request.user.is_accounts_staff or request.user.is_admin_user) and ch.balance_remaining > 0 %}
-                        <a href="{% url 'finance:record_payment' %}?charge_id={{ ch.id }}" class="text-xs text-blue-600 font-bold hover:underline">
-                            Collect &rarr;
-                        </a>
+                        {% if ch.balance_remaining > 0 %}
+                            {% if request.user.is_accounts_staff or request.user.is_admin_user %}
+                            <a href="{% url 'finance:record_payment' %}?charge_id={{ ch.id }}" class="text-xs text-blue-600 font-bold hover:underline">
+                                Collect &rarr;
+                            </a>
+                            {% else %}
+                            <span class="text-xs text-red-500 font-semibold">Due</span>
+                            {% endif %}
                         {% else %}
                         <span class="text-xs text-gray-400">Settled</span>
                         {% endif %}

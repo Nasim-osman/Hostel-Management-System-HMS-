@@ -13,6 +13,7 @@ urlpatterns = [
     path('transfers/request/', views.request_transfer_view, name='request_transfer'),
     path('transfers/<int:transfer_id>/process/', views.process_transfer_view, name='process_transfer'),
     path('clearance/', views.clearance_list_view, name='clearance_list'),
+    path('clearances/', views.clearance_list_view),
     path('clearance/request/', views.request_clearance_view, name='request_clearance'),
     path('clearance/<int:clearance_id>/approve-step/', views.approve_clearance_step_view, name='approve_clearance_step'),
 ]

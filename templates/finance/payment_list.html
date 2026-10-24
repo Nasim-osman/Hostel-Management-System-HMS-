@@ -62,13 +62,17 @@
                             <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                             PDF
                         </a>
-                        {% elif (request.user.is_accounts_staff or request.user.is_admin_user) and p.status == 'PENDING' %}
-                        <form method="POST" action="{% url 'finance:verify_payment' p.id %}" class="inline">
-                            {% csrf_token %}
-                            <button type="submit" name="action" value="verify" class="px-2 py-1 bg-green-700 text-white text-[10px] font-bold rounded hover:bg-green-800">
-                                Verify
-                            </button>
-                        </form>
+                        {% elif p.status == 'PENDING' %}
+                            {% if request.user.is_accounts_staff or request.user.is_admin_user %}
+                            <form method="POST" action="{% url 'finance:verify_payment' p.id %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" name="action" value="verify" class="px-2 py-1 bg-green-700 text-white text-[10px] font-bold rounded hover:bg-green-800">
+                                    Verify
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-xs text-amber-600 font-medium">Pending Review</span>
+                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>

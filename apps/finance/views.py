@@ -169,7 +169,7 @@ def create_charge_view(request):
         form = ResidentChargeForm(request.POST)
         if form.is_valid():
             charge = form.save()
-            messages.success(request, f"Charge of ₹{charge.amount} assigned to {charge.resident.student_id}.")
+            messages.success(request, f"Charge of ৳{charge.amount} assigned to {charge.resident.student_id}.")
             return redirect('finance:fee_list')
     else:
         form = ResidentChargeForm()

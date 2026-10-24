@@ -53,7 +53,10 @@
 
         <!-- CARD 1: Rooms (Col span 4) -->
         <div class="lg:col-span-4 hms-card">
-            <h2 class="hms-card-title">Rooms</h2>
+            <a href="{% url 'rooms:room_list' %}" class="hms-card-title hover:text-blue-600 transition flex items-center justify-between">
+                <span>Rooms</span>
+                <span class="text-[11px] font-normal text-blue-600">View All &rarr;</span>
+            </a>
             <div class="grid grid-cols-3 text-center pt-2">
                 <div>
                     <div class="stat-number-blue">{{ total_rooms }}</div>
@@ -72,7 +75,10 @@
 
         <!-- CARD 2: Payment (Col span 4) -->
         <div class="lg:col-span-4 hms-card">
-            <h2 class="hms-card-title">Payment</h2>
+            <a href="{% url 'finance:payment_list' %}" class="hms-card-title hover:text-blue-600 transition flex items-center justify-between">
+                <span>Payment</span>
+                <span class="text-[11px] font-normal text-blue-600">History &rarr;</span>
+            </a>
             <div class="grid grid-cols-2 text-center pt-2">
                 <div>
                     <div class="stat-number-green">৳ {{ total_paid|bd_format }}</div>
@@ -87,7 +93,10 @@
 
         <!-- CARD 3: Amenities (Col span 4) -->
         <div class="lg:col-span-4 hms-card">
-            <h2 class="hms-card-title">Amenities</h2>
+            <a href="{% url 'rooms:amenity_list' %}" class="hms-card-title hover:text-blue-600 transition flex items-center justify-between">
+                <span>Amenities</span>
+                <span class="text-[11px] font-normal text-blue-600">Facility Status &rarr;</span>
+            </a>
             <div class="flex items-center justify-between pt-3 px-2">
                 <!-- Light -->
                 <div class="flex flex-col items-center">
@@ -129,7 +138,10 @@
 
         <!-- CARD 4: Tenants (Col span 4) -->
         <div class="lg:col-span-4 hms-card">
-            <h2 class="hms-card-title">Tenants</h2>
+            <a href="{% url 'residents:resident_list' %}" class="hms-card-title hover:text-blue-600 transition flex items-center justify-between">
+                <span>Tenants</span>
+                <span class="text-[11px] font-normal text-blue-600">Directory &rarr;</span>
+            </a>
             <div class="flex items-center justify-between px-4 py-2">
                 <!-- Donut Chart -->
                 <div class="relative w-32 h-32 flex items-center justify-center">
@@ -155,7 +167,9 @@
         <!-- CARD 5: Mess (Today's Meal) (Col span 4) -->
         <div class="lg:col-span-4 hms-card">
             <div class="flex items-center justify-between mb-3">
-                <h2 class="hms-card-title mb-0">Mess</h2>
+                <a href="{% url 'dining:meal_menu' %}" class="hms-card-title mb-0 hover:text-blue-600 transition">
+                    Mess &rarr;
+                </a>
                 <span class="text-[11px] text-gray-400 font-medium">Today's Meal</span>
             </div>
             <div class="space-y-3 text-xs">
@@ -198,7 +212,9 @@
         <!-- CARD 6: Tickets (Col span 4) -->
         <div class="lg:col-span-4 hms-card">
             <div class="flex items-center justify-between mb-3">
-                <h2 class="hms-card-title mb-0">Tickets</h2>
+                <a href="{% url 'complaints:complaint_list' %}" class="hms-card-title mb-0 hover:text-blue-600 transition">
+                    Tickets &rarr;
+                </a>
                 <span class="text-[11px] text-gray-400 font-medium">Unsolved issues - {{ unsolved_count }}</span>
             </div>
             <div class="space-y-3">
@@ -257,7 +273,9 @@
         <!-- CARD 7: Visitors (Col span 6) -->
         <div class="lg:col-span-6 hms-card">
             <div class="flex items-center justify-between mb-3">
-                <h2 class="hms-card-title mb-0">Visitors</h2>
+                <a href="{% url 'visitors:visitor_list' %}" class="hms-card-title mb-0 hover:text-blue-600 transition">
+                    Visitors &rarr;
+                </a>
                 <span class="text-[11px] text-gray-400 font-medium">Total {{ total_active_visitors }}</span>
             </div>
             <div class="space-y-3 pt-1">
@@ -279,7 +297,10 @@
 
         <!-- CARD 8: Reports (Col span 6) -->
         <div class="lg:col-span-6 hms-card">
-            <h2 class="hms-card-title">Reports</h2>
+            <a href="{% url 'reports:reports_overview' %}" class="hms-card-title hover:text-blue-600 transition flex items-center justify-between">
+                <span>Reports</span>
+                <span class="text-[11px] font-normal text-blue-600">Full Reports &rarr;</span>
+            </a>
             <div class="space-y-3 pt-1">
                 <a href="{% url 'rooms:room_list' %}?availability=vacant" class="text-sm font-semibold text-gray-700 bg-gray-50 p-2.5 rounded border border-gray-100 flex items-center justify-between hover:bg-gray-100 transition">
                     <span>Total Number of Vacant Room</span>

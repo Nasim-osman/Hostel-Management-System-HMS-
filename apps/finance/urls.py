@@ -1,9 +1,12 @@
 from django.urls import path
 from . import views
 
+from django.shortcuts import redirect
+
 app_name = 'finance'
 
 urlpatterns = [
+    path('', lambda request: redirect('finance:payment_list')),
     path('dashboard/', views.accounts_dashboard_view, name='accounts_dashboard'),
     path('payments/', views.payment_list_view, name='payment_list'),
     path('payments/record/', views.record_payment_view, name='record_payment'),

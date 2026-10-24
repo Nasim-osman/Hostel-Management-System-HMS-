@@ -3,56 +3,242 @@
 {% block title %}My Profile — HMS{% endblock %}
 
 {% block content %}
-<div class="max-w-xl mx-auto space-y-6">
-    <div>
-        <h1 class="text-2xl font-bold tracking-tight text-gray-900">User Profile</h1>
-        <p class="text-xs text-gray-500 mt-1">Manage your HMS account settings and personal details.</p>
+<div class="max-w-6xl mx-auto space-y-6">
+
+    <!-- Page Header -->
+    <div class="flex items-center justify-between pb-2 border-b border-gray-200">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900">User Profile & Account</h1>
+            <p class="text-xs text-gray-500 mt-1">Manage personal contact information, academic identification, emergency contacts, and account security.</p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <a href="{% url 'accounts:password_change' %}" class="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold rounded shadow-sm">
+                Change Password
+            </a>
+            <a href="{% url 'accounts:dashboard' %}" class="px-3 py-1.5 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+                &larr; Back to Dashboard
+            </a>
+        </div>
     </div>
 
-    <div class="hms-card">
-        <div class="flex items-center space-x-4 pb-4 border-b border-gray-100 mb-4">
-            <div class="w-14 h-14 rounded-full bg-[#0060af] text-white font-bold text-xl flex items-center justify-center shadow">
+    <!-- Identity Overview Card -->
+    <div class="hms-card bg-gradient-to-r from-slate-900 to-slate-800 text-white p-6">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 text-center sm:text-left">
+            <div class="w-20 h-20 rounded-full bg-[#0060af] text-white font-bold text-3xl flex items-center justify-center shadow-lg border-2 border-white/20">
                 {{ user_obj.first_name|default:user_obj.username|make_list|first|upper }}
             </div>
-            <div>
-                <h2 class="text-base font-bold text-gray-900">{{ user_obj.get_full_name|default:user_obj.username }}</h2>
-                <div class="flex items-center space-x-2 mt-0.5">
-                    <span class="badge badge-info">{{ user_obj.get_role_display }}</span>
-                    <span class="text-xs text-gray-400">@{{ user_obj.username }}</span>
+            <div class="space-y-1.5 flex-1">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-3">
+                    <h2 class="text-xl font-bold">{{ user_obj.get_full_name|default:user_obj.username }}</h2>
+                    <span class="inline-block mt-1 sm:mt-0 px-2.5 py-0.5 bg-blue-500/30 text-blue-200 text-xs font-semibold rounded-full border border-blue-400/30">
+                        {{ user_obj.get_role_display }}
+                    </span>
+                </div>
+                <p class="text-xs text-gray-300">Username: <span class="font-mono text-white">@{{ user_obj.username }}</span> &bull; Email: {{ user_obj.email|default:"Not configured" }} &bull; Phone: {{ user_obj.phone_number|default:"Not configured" }}</p>
+                <div class="pt-2 flex flex-wrap gap-4 text-[11px] text-gray-400">
+                    <span>Member Since: {{ user_obj.date_joined|date:"M d, Y" }}</span>
+                    <span>Last Login: {{ user_obj.last_login|date:"M d, Y H:i"|default:"Active session" }}</span>
+                    <span class="text-green-400">&bull; Account Active & Verified</span>
                 </div>
             </div>
         </div>
-
-        <form method="POST" class="space-y-4">
-            {% csrf_token %}
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1">First Name</label>
-                    {{ form.first_name }}
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1">Last Name</label>
-                    {{ form.last_name }}
-                </div>
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Email Address</label>
-                {{ form.email }}
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Phone Number</label>
-                {{ form.phone_number }}
-            </div>
-
-            <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
-                <a href="{% url 'accounts:password_change' %}" class="text-xs text-[#0060af] font-semibold hover:underline">
-                    Change Password &rarr;
-                </a>
-                <button type="submit" class="px-4 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
-                    Save Profile Updates
-                </button>
-            </div>
-        </form>
     </div>
+
+    <!-- 2-Column Details Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Column 1: Academic & Allotment Details (if resident) or Role Info (if staff) -->
+        <div class="lg:col-span-5 space-y-6">
+
+            {% if resident_profile %}
+            <!-- Student Academic Record -->
+            <div class="hms-card space-y-3">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+                    <h3 class="hms-card-title mb-0">University Academic Record</h3>
+                    <span class="badge badge-success text-[10px]">Verified Student</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <span class="text-gray-400 block text-[10px] uppercase font-bold">Student ID / Reg</span>
+                        <span class="font-bold text-gray-900 font-mono">{{ resident_profile.student_id }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 block text-[10px] uppercase font-bold">Academic Batch</span>
+                        <span class="font-semibold text-gray-800">{{ resident_profile.batch_year|default:"2022-2026" }}</span>
+                    </div>
+                    <div class="col-span-2">
+                        <span class="text-gray-400 block text-[10px] uppercase font-bold">Department / Course</span>
+                        <span class="font-semibold text-gray-800">{{ resident_profile.course }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 block text-[10px] uppercase font-bold">Blood Group</span>
+                        <span class="font-bold text-red-600">{{ resident_profile.blood_group|default:"Not recorded" }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 block text-[10px] uppercase font-bold">Gender</span>
+                        <span class="font-semibold text-gray-800">{{ resident_profile.get_gender_display }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Residential Hall Allocation Details -->
+            <div class="hms-card space-y-3">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+                    <h3 class="hms-card-title mb-0">Hall Seat Allotment</h3>
+                    <span class="badge badge-info text-[10px]">Official Allotment</span>
+                </div>
+
+                {% if resident_profile.current_bed %}
+                <div class="bg-blue-50/50 p-3.5 rounded border border-blue-100 space-y-2 text-xs">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-500 font-medium">Hostel Block:</span>
+                        <span class="font-bold text-gray-900">{{ resident_profile.current_room.block.name }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-500 font-medium">Room & Floor:</span>
+                        <span class="font-bold text-gray-900">Room {{ resident_profile.current_room.room_number }} (Floor {{ resident_profile.current_room.floor }})</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-500 font-medium">Assigned Bed:</span>
+                        <span class="font-bold text-[#0060af]">{{ resident_profile.current_bed.bed_number }}</span>
+                    </div>
+                    <div class="flex items-center justify-between pt-1 border-t border-blue-100">
+                        <span class="text-gray-500 font-medium">Admission Date:</span>
+                        <span class="text-gray-700">{{ resident_profile.admission_date|date:"F d, Y" }}</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 pt-1">
+                    <a href="{% url 'allocations:request_transfer' %}" class="flex-1 text-center py-1.5 bg-white border border-gray-200 text-xs font-semibold text-gray-700 rounded hover:bg-gray-50">
+                        Request Transfer
+                    </a>
+                    <a href="{% url 'allocations:request_clearance' %}" class="flex-1 text-center py-1.5 bg-white border border-gray-200 text-xs font-semibold text-red-600 rounded hover:bg-red-50">
+                        Apply Clearance
+                    </a>
+                </div>
+                {% else %}
+                <div class="p-4 bg-amber-50 rounded border border-amber-200 text-xs text-amber-800 space-y-2">
+                    <p class="font-semibold">No active bed allotment on file.</p>
+                    <a href="{% url 'allocations:apply_seat' %}" class="inline-block px-3 py-1 bg-amber-600 text-white rounded text-xs font-bold">Apply for Hostel Seat &rarr;</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Guardian & Emergency Contact Card -->
+            <div class="hms-card space-y-3">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+                    <h3 class="hms-card-title mb-0">Emergency & Guardian Info</h3>
+                    <span class="text-[10px] text-gray-400">Institutional Safety Record</span>
+                </div>
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Guardian Name:</span>
+                        <span class="font-semibold text-gray-800">{{ resident_profile.emergency_contact_name|default:"Not recorded" }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Relationship:</span>
+                        <span class="font-semibold text-gray-800">{{ resident_profile.emergency_contact_relation|default:"Parent / Guardian" }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Emergency Phone:</span>
+                        <span class="font-bold text-gray-900 font-mono">{{ resident_profile.emergency_contact_phone|default:"Not recorded" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- Staff Responsibilities Card (for non-residents) -->
+            <div class="hms-card space-y-3">
+                <h3 class="hms-card-title border-b border-gray-100 pb-2">Staff Scope & Permissions</h3>
+                <div class="text-xs space-y-2 text-gray-600">
+                    <p><span class="font-bold text-gray-800">Role:</span> {{ user_obj.get_role_display }}</p>
+                    <p><span class="font-bold text-gray-800">Staff Status:</span> {% if user_obj.is_staff %}Yes (Institutional Staff){% else %}No{% endif %}</p>
+                    <p><span class="font-bold text-gray-800">Superuser:</span> {% if user_obj.is_superuser %}Full Administrative Access{% else %}Role-Scoped Authorization{% endif %}</p>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- Column 2: Editable Profile & Contact Form -->
+        <div class="lg:col-span-7 space-y-6">
+
+            <div class="hms-card">
+                <h3 class="hms-card-title border-b border-gray-100 pb-2 mb-4">Edit Personal & Contact Details</h3>
+                
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Email Address</label>
+                            {{ form.email }}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Phone Number (Bangladeshi +880)</label>
+                            {{ form.phone_number }}
+                        </div>
+                    </div>
+
+                    {% if resident_profile %}
+                    <div class="pt-3 border-t border-gray-100">
+                        <div class="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">Emergency & Guardian Contacts</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Guardian / Emergency Contact Name</label>
+                                <input type="text" name="emergency_contact_name" value="{{ resident_profile.emergency_contact_name }}" class="form-input">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Guardian Phone Number</label>
+                                <input type="text" name="emergency_contact_phone" value="{{ resident_profile.emergency_contact_phone }}" class="form-input">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Relationship</label>
+                                <input type="text" name="emergency_contact_relation" value="{{ resident_profile.emergency_contact_relation }}" class="form-input">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-700 mb-1">Blood Group</label>
+                                <input type="text" name="blood_group" value="{{ resident_profile.blood_group }}" class="form-input" placeholder="e.g. O+, B+, A+">
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
+                        <span class="text-xs text-gray-400">All updates are logged securely in audit logs.</span>
+                        <button type="submit" class="px-5 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-bold rounded shadow transition">
+                            Save Profile Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Account Security & Password Card -->
+            <div class="hms-card bg-gray-50 border border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-900">Account Credentials & Password</h4>
+                        <p class="text-xs text-gray-500 mt-0.5">Keep your account secure with regular password updates.</p>
+                    </div>
+                    <a href="{% url 'accounts:password_change' %}" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded">
+                        Update Password &rarr;
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 {% endblock %}

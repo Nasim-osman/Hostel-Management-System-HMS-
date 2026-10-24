@@ -21,6 +21,15 @@ urlpatterns = [
     path('notifications/', include('apps.notifications.urls', namespace='notifications')),
     path('abtesting/', include('apps.abtesting.urls', namespace='abtesting')),
     path('reports/', include('apps.reports.urls', namespace='reports')),
+
+    # Convenience direct shortcuts matching sidebar labels
+    path('amenities/', lambda request: redirect('rooms:amenity_list')),
+    path('payment/', lambda request: redirect('finance:payment_list')),
+    path('payments/', lambda request: redirect('finance:payment_list')),
+    path('tenants/', lambda request: redirect('residents:resident_list')),
+    path('mess/', lambda request: redirect('dining:meal_menu')),
+    path('tickets/', lambda request: redirect('complaints:complaint_list')),
+    path('profile/', lambda request: redirect('accounts:profile')),
 ]
 
 if settings.DEBUG:

@@ -176,15 +176,34 @@ def hostel_management_dashboard(request):
 @login_required
 def profile_view(request):
     user = request.user
+    resident_profile = getattr(user, 'resident_profile', None)
     if request.method == 'POST':
         form = UserProfileUpdateForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
+            if resident_profile:
+                emergency_name = request.POST.get('emergency_contact_name')
+                emergency_phone = request.POST.get('emergency_contact_phone')
+                emergency_rel = request.POST.get('emergency_contact_relation')
+                blood_group = request.POST.get('blood_group')
+                if emergency_name:
+                    resident_profile.emergency_contact_name = emergency_name
+                if emergency_phone:
+                    resident_profile.emergency_contact_phone = emergency_phone
+                if emergency_rel:
+                    resident_profile.emergency_contact_relation = emergency_rel
+                if blood_group:
+                    resident_profile.blood_group = blood_group
+                resident_profile.save()
             messages.success(request, "Your profile details have been updated successfully.")
             return redirect('accounts:profile')
     else:
         form = UserProfileUpdateForm(instance=user)
-    return render(request, 'accounts/profile.html', {'form': form, 'user_obj': user})
+    return render(request, 'accounts/profile.html', {
+        'form': form,
+        'user_obj': user,
+        'resident_profile': resident_profile
+    })
 
 
 @login_required

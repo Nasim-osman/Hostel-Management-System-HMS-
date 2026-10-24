@@ -66,13 +66,17 @@
                         {% endif %}
                     </td>
                     <td class="text-right">
-                        {% if (request.user.is_warden or request.user.is_admin_user) and vis.status == 'CHECKED_IN' %}
-                        <form method="POST" action="{% url 'visitors:check_out' vis.id %}" class="inline">
-                            {% csrf_token %}
-                            <button type="submit" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-semibold rounded">
-                                Check Out
-                            </button>
-                        </form>
+                        {% if vis.status == 'CHECKED_IN' %}
+                            {% if request.user.is_warden or request.user.is_admin_user %}
+                            <form method="POST" action="{% url 'visitors:check_out' vis.id %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-semibold rounded">
+                                    Check Out
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-xs text-green-600 font-medium">Checked In</span>
+                            {% endif %}
                         {% else %}
                         <span class="text-xs text-gray-400">-</span>
                         {% endif %}
