@@ -1,3 +1,4 @@
+from django.contrib.auth import login, get_user_model
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -7,8 +8,10 @@ from apps.accounts.decorators import role_required, warden_or_admin_only, reside
 from apps.rooms.models import Room, Bed
 from apps.residents.models import ResidentProfile
 from .models import SeatApplication, SeatAllocation, WaitingListEntry, RoomTransferRequest, CheckoutClearance
-from .forms import SeatApplicationForm, RoomTransferRequestForm, CheckoutClearanceRequestForm
+from .forms import SeatApplicationForm, PublicSeatApplicationForm, RoomTransferRequestForm, CheckoutClearanceRequestForm
 from .services import AllocationService
+
+User = get_user_model()
 
 
 @login_required
@@ -29,29 +32,120 @@ def application_list_view(request):
     })
 
 
-@login_required
-@resident_access_only
 def apply_seat_view(request):
-    resident = getattr(request.user, 'resident_profile', None)
-    if not resident:
-        messages.error(request, "Resident profile required to apply for a hostel seat.")
-        return redirect('accounts:dashboard')
+    """
+    Hostel Seat Application view.
+    - If user is already authenticated as a resident: simple room preference form.
+    - If user is a new applicant / visitor: full registration and seat application form.
+    """
+    if request.user.is_authenticated:
+        if not request.user.is_resident:
+            messages.info(request, "Staff accounts cannot submit resident seat applications.")
+            return redirect('accounts:dashboard')
 
-    if resident.current_bed:
-        messages.info(request, "You are already allocated to a bed.")
-        return redirect('residents:resident_dashboard')
+        resident = getattr(request.user, 'resident_profile', None)
+        if not resident:
+            messages.error(request, "Resident profile required to apply for a hostel seat.")
+            return redirect('accounts:dashboard')
 
+        if resident.current_bed:
+            messages.info(request, f"You are already allocated to Bed: {resident.current_bed}.")
+            return redirect('residents:resident_dashboard')
+
+        if request.method == 'POST':
+            form = SeatApplicationForm(request.POST)
+            if form.is_valid():
+                app = form.save(commit=False)
+                app.resident = resident
+                app.save()
+                messages.success(request, f"Seat application submitted successfully (Ref: #{app.id}). The Hall Warden will review it.")
+                return redirect('allocations:application_list')
+        else:
+            form = SeatApplicationForm()
+
+        return render(request, 'allocations/apply_seat.html', {'form': form, 'is_public': False})
+
+    # Unauthenticated / New Student Application Workflow
     if request.method == 'POST':
-        form = SeatApplicationForm(request.POST)
+        form = PublicSeatApplicationForm(request.POST)
         if form.is_valid():
-            app = form.save(commit=False)
-            app.resident = resident
-            app.save()
-            messages.success(request, f"Seat application submitted successfully (Ref: #{app.id}).")
+            data = form.cleaned_data
+            student_id = data['student_id'].strip().upper()
+            email = data['email'].strip().lower()
+
+            # Check if user already exists
+            if User.objects.filter(username=student_id).exists() or User.objects.filter(email=email).exists():
+                messages.error(request, f"An account with Student ID '{student_id}' or Email '{email}' already exists. Please sign in.")
+                return redirect('accounts:login')
+
+            name_parts = data['full_name'].strip().split(' ', 1)
+            first_name = name_parts[0]
+            last_name = name_parts[1] if len(name_parts) > 1 else 'Student'
+
+            # 1. Create User
+            user = User.objects.create(
+                username=student_id,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                phone_number=data['phone_number'],
+                role=User.Role.RESIDENT,
+                is_active=True
+            )
+            user.set_password(data['password'])
+            user.save()
+
+            # 2. Create ResidentProfile (Pending status)
+            resident = ResidentProfile.objects.create(
+                user=user,
+                student_id=student_id,
+                course=data['course'],
+                batch_year=data['batch_year'],
+                gender=data['gender'],
+                blood_group=data['blood_group'] or 'O+',
+                emergency_contact_name=data['guardian_name'],
+                emergency_contact_phone=data['guardian_phone'],
+                emergency_contact_relation=data['guardian_relation'],
+                status=ResidentProfile.Status.APPLICANT,
+                admission_date=timezone.now().date()
+            )
+
+            # 3. Create SeatApplication
+            app = SeatApplication.objects.create(
+                resident=resident,
+                preferred_block=data['preferred_block'],
+                preferred_room_type=data['preferred_room_type'],
+                academic_year=data['academic_year'],
+                status=SeatApplication.Status.PENDING
+            )
+
+            # 4. Auto login
+            login(request, user)
+            messages.success(request, f"Congratulations {first_name}! Your hostel seat application (Ref: #{app.id}) has been submitted to the Hall Warden.")
             return redirect('allocations:application_list')
     else:
-        form = SeatApplicationForm()
-    return render(request, 'allocations/apply_seat.html', {'form': form})
+        form = PublicSeatApplicationForm()
+
+    return render(request, 'allocations/apply_seat.html', {'form': form, 'is_public': True})
+
+
+def track_application_view(request):
+    """
+    Public seat application tracker for any applicant or visitor.
+    """
+    query = request.GET.get('q', '').strip()
+    application = None
+    if query:
+        if query.isdigit():
+            application = SeatApplication.objects.filter(id=int(query)).select_related('resident', 'resident__user', 'preferred_block').first()
+        if not application:
+            application = SeatApplication.objects.filter(resident__student_id__iexact=query).select_related('resident', 'resident__user', 'preferred_block').first()
+
+    return render(request, 'allocations/track_application.html', {
+        'query': query,
+        'application': application
+    })
+
 
 
 @login_required

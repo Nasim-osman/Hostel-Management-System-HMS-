@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+
+{% block title %}HMS — University Hall & Hostel Residence Portal{% endblock %}
+
+{% block content %}
+<div class="space-y-8 max-w-6xl mx-auto">
+
+    <!-- HERO SECTION -->
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0060af] via-[#004e8c] to-[#0a2540] text-white p-8 md:p-12 shadow-xl">
+        <div class="relative z-10 max-w-3xl space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-blue-100">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                Academic Year 2026–2027 Hall Seat Allotment Open
+            </div>
+
+            <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
+                University Hall Residence & Hostel Management System
+            </h1>
+
+            <p class="text-sm md:text-base text-blue-100 leading-relaxed max-w-2xl">
+                Official automated residential platform for university students, hall administration, and visitors. 
+                Apply for hall seats, track queue priority, monitor mess dining, and manage clearances online.
+            </p>
+
+            <!-- Action CTAs -->
+            <div class="pt-3 flex flex-wrap items-center gap-3">
+                <a href="{% url 'allocations:apply_seat' %}" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center gap-2">
+                    <span>&plus; Apply for Hostel Seat</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+
+                <a href="{% url 'allocations:track_application' %}" class="px-5 py-3 bg-white/15 hover:bg-white/25 border border-white/30 text-white font-semibold text-sm rounded-xl backdrop-blur-md transition">
+                    Track Seat Application
+                </a>
+
+                <a href="{% url 'accounts:login' %}" class="px-5 py-3 bg-white text-[#0060af] hover:bg-blue-50 font-bold text-sm rounded-xl shadow transition">
+                    Portal Sign In
+                </a>
+            </div>
+        </div>
+
+        <!-- Decorative background shapes -->
+        <div class="absolute -right-10 -bottom-10 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl pointer-events-none"></div>
+    </div>
+
+    <!-- REAL-TIME CAPACITY KPI CARDS -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="hms-card bg-white border border-gray-100 p-5">
+            <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Total Hall Rooms</span>
+            <div class="text-2xl font-bold text-gray-900 mt-1">{{ total_rooms }}</div>
+            <span class="text-xs text-blue-600 font-medium">Building A & B</span>
+        </div>
+
+        <div class="hms-card bg-white border border-gray-100 p-5">
+            <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Available Vacant Rooms</span>
+            <div class="text-2xl font-bold text-emerald-600 mt-1">{{ vacant_rooms }}</div>
+            <span class="text-xs text-gray-500 font-medium">Ready for allocation</span>
+        </div>
+
+        <div class="hms-card bg-white border border-gray-100 p-5">
+            <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Total Bed Capacity</span>
+            <div class="text-2xl font-bold text-gray-900 mt-1">{{ total_capacity }}</div>
+            <span class="text-xs text-gray-500 font-medium">Single, Double & Triple</span>
+        </div>
+
+        <div class="hms-card bg-white border border-gray-100 p-5">
+            <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">Vacant Beds</span>
+            <div class="text-2xl font-bold text-indigo-600 mt-1">{{ vacant_beds }}</div>
+            <span class="text-xs text-emerald-600 font-medium">Open for applicants</span>
+        </div>
+    </div>
+
+    <!-- HOW IT WORKS: NEW MEMBER ONBOARDING WORKFLOW -->
+    <div class="hms-card">
+        <div class="mb-5 text-center max-w-xl mx-auto">
+            <h2 class="text-xl font-bold text-gray-900">How to Get a Hostel Seat</h2>
+            <p class="text-xs text-gray-500 mt-1">Simple 3-step transparent seat allocation and onboarding process for new members.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+            <!-- Step 1 -->
+            <div class="p-4 rounded-xl border border-gray-100 bg-slate-50/50 space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm shadow-sm">
+                    1
+                </div>
+                <h3 class="font-bold text-sm text-gray-900">Submit Seat Application</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Fill in your university Student Roll/ID, Department, batch, guardian contact info, and select your preferred hostel block and room sharing type.
+                </p>
+                <div class="pt-2">
+                    <a href="{% url 'allocations:apply_seat' %}" class="text-blue-600 font-semibold hover:underline">Apply Online &rarr;</a>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="p-4 rounded-xl border border-gray-100 bg-slate-50/50 space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-sm shadow-sm">
+                    2
+                </div>
+                <h3 class="font-bold text-sm text-gray-900">Warden Review & Queue</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Hall Warden and Administration verify academic eligibility and merit. Applications are approved or assigned transparent waiting list queue positions.
+                </p>
+                <div class="pt-2">
+                    <a href="{% url 'allocations:track_application' %}" class="text-emerald-700 font-semibold hover:underline">Track Queue Status &rarr;</a>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="p-4 rounded-xl border border-gray-100 bg-slate-50/50 space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm shadow-sm">
+                    3
+                </div>
+                <h3 class="font-bold text-sm text-gray-900">Seat Allotment & Check-in</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Once allocated, your room and bed key are assigned. Sign in to your student dashboard to manage dining meals, outpass passes, and invoices.
+                </p>
+                <div class="pt-2">
+                    <a href="{% url 'accounts:login' %}" class="text-indigo-600 font-semibold hover:underline">Portal Login &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROOM TYPES & FEE STRUCTURE -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Double Sharing -->
+        <div class="hms-card border-t-4 border-t-[#0060af] flex flex-col justify-between">
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-blue-700 uppercase tracking-wider">Double Sharing Room</span>
+                    <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-bold text-xs">Popular</span>
+                </div>
+                <div class="text-3xl font-extrabold text-gray-900">
+                    ৳ 6,000 <span class="text-xs text-gray-400 font-normal">/ month</span>
+                </div>
+                <p class="text-xs text-gray-600">Spacious accommodation with dedicated personal workspace and shared balcony.</p>
+                
+                <ul class="space-y-1.5 text-xs text-gray-600 pt-2">
+                    <li class="flex items-center gap-2"><span class="text-emerald-600 font-bold">✓</span> 2 Individual study tables with book shelving</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-600 font-bold">✓</span> Wooden wardrobe with secure lock & key</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-600 font-bold">✓</span> High-speed campus fiber WiFi access</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-600 font-bold">✓</span> Daily housekeeping & waste management</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-600 font-bold">✓</span> 24/7 Filtered drinking water & generator power</li>
+                </ul>
+            </div>
+            <div class="pt-4 mt-4 border-t border-gray-100">
+                <a href="{% url 'allocations:apply_seat' %}" class="w-full block text-center py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+                    Apply for Double Sharing
+                </a>
+            </div>
+        </div>
+
+        <!-- Triple Sharing -->
+        <div class="hms-card border-t-4 border-t-emerald-600 flex flex-col justify-between">
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Triple Sharing Room</span>
+                    <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-bold text-xs">Economical</span>
+                </div>
+                <div class="text-3xl font-extrabold text-gray-900">
+                    ৳ 4,500 <span class="text-xs text-gray-400 font-normal">/ month</span>
+                </div>
+                <p class="text-xs text-gray-600">Cost-effective shared hall living designed for standard university academic sessions.</p>
+                
+                <ul class="space-y-1.5 text-xs text-gray-600 pt-2">
+                    <li class="flex items-center gap-2"><span class="text-emerald-600 font-bold">✓</span> 3 Single beds with mattresses and storage</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-600 font-bold">✓</span> Individual study reading desks</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-600 font-bold">✓</span> High-speed campus fiber WiFi access</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-600 font-bold">✓</span> Daily common room cleaning</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-600 font-bold">✓</span> Solar hot water geyser & dining mess access</li>
+                </ul>
+            </div>
+            <div class="pt-4 mt-4 border-t border-gray-100">
+                <a href="{% url 'allocations:apply_seat' %}" class="w-full block text-center py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded shadow-sm">
+                    Apply for Triple Sharing
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- CAMPUS AMENITIES & DINING MESS -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Amenities List -->
+        <div class="hms-card">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="hms-card-title mb-0">Hall Facilities & Amenities</h2>
+                <a href="{% url 'rooms:amenity_list' %}" class="text-xs text-blue-600 hover:underline">View All &rarr;</a>
+            </div>
+            <div class="space-y-2.5">
+                {% for amenity in amenities %}
+                <div class="p-2.5 bg-gray-50 rounded border border-gray-100 flex items-center justify-between text-xs">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">★</span>
+                        <div>
+                            <span class="font-semibold text-gray-900">{{ amenity.name }}</span>
+                            <span class="text-[11px] text-gray-500 block">{{ amenity.description }}</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-success text-[10px]">Operational</span>
+                </div>
+                {% empty %}
+                <p class="text-xs text-gray-400">Amenities operational 24/7.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Mess Menu Quick View with Meal ON/OFF feature highlight -->
+        <div class="hms-card flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="hms-card-title mb-0">Dining & Mess Service</h2>
+                    <a href="{% url 'dining:meal_menu' %}" class="text-xs text-blue-600 hover:underline">Full Schedule &rarr;</a>
+                </div>
+                <div class="p-3 rounded-lg bg-amber-50/60 border border-amber-200 mb-3 text-xs">
+                    <span class="font-bold text-amber-900 block mb-0.5">💡 Flexible Meal ON / OFF System</span>
+                    <p class="text-amber-800">
+                        Residents have total control to turn Breakfast, Lunch, or Dinner ON or OFF from their dashboard. Turning meals OFF pauses tokens and deducts meal costs!
+                    </p>
+                </div>
+                <div class="space-y-2 text-xs">
+                    {% for meal in meals %}
+                    <div class="p-2 bg-gray-50 rounded border border-gray-100 flex items-start justify-between">
+                        <div>
+                            <span class="font-bold text-gray-900">{{ meal.get_meal_type_display }}:</span>
+                            <span class="text-gray-700 ml-1">{{ meal.veg_items }}</span>
+                        </div>
+                        <span class="text-[10px] text-gray-400">{{ meal.timing }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="pt-3 border-t border-gray-100 text-right">
+                <a href="{% url 'dining:meal_menu' %}" class="text-xs text-[#0060af] font-semibold hover:underline">
+                    Explore Mess Menu & Feedback &rarr;
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECENT PUBLIC NOTICES -->
+    <div class="hms-card">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h2 class="hms-card-title mb-0">Official Hall Announcements & Notices</h2>
+                <p class="text-xs text-gray-500">Important dates, clearance schedules, and administrative notices from the Provost Office.</p>
+            </div>
+            <a href="{% url 'notices:notice_list' %}" class="text-xs text-blue-600 hover:underline">Notice Archive &rarr;</a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            {% for n in notices %}
+            <div class="p-3 bg-gray-50 rounded-lg border border-gray-100 flex items-start justify-between">
+                <div>
+                    <span class="font-semibold text-gray-900 block">{{ n.title }}</span>
+                    <span class="text-[11px] text-gray-500 line-clamp-1 mt-0.5">{{ n.content }}</span>
+                </div>
+                <span class="text-[10px] text-gray-400 whitespace-nowrap ml-2">{{ n.publish_date|date:"M d, Y" }}</span>
+            </div>
+            {% empty %}
+            <p class="text-xs text-gray-400 italic">No announcements posted at this time.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- HALL PROVOST DESK & CONTACT -->
+    <div class="p-6 rounded-xl bg-slate-900 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-md">
+        <div class="space-y-1 text-center md:text-left">
+            <h3 class="text-base font-bold text-white">HMS — Hall Administration & Provost Office</h3>
+            <p class="text-xs text-slate-300">Curzon Hall Campus &bull; Dhaka-1000, Bangladesh</p>
+            <p class="text-[11px] text-slate-400">Helpline: +880 1711 000001 &bull; Email: hall.provost@hms.university.edu</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'allocations:apply_seat' %}" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg shadow transition">
+                Apply for Seat
+            </a>
+            <a href="{% url 'accounts:login' %}" class="px-4 py-2 bg-white text-slate-900 hover:bg-slate-100 text-xs font-bold rounded-lg shadow transition">
+                Sign In
+            </a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

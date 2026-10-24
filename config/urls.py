@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', lambda request: redirect('accounts:dashboard')),
+    path('', lambda request: redirect('accounts:dashboard' if request.user.is_authenticated else 'accounts:public_portal')),
     path('accounts/', include('apps.accounts.urls', namespace='accounts')),
     path('rooms/', include('apps.rooms.urls', namespace='rooms')),
     path('residents/', include('apps.residents.urls', namespace='residents')),
@@ -22,7 +22,10 @@ urlpatterns = [
     path('abtesting/', include('apps.abtesting.urls', namespace='abtesting')),
     path('reports/', include('apps.reports.urls', namespace='reports')),
 
-    # Convenience direct shortcuts matching sidebar labels
+    # Convenience direct shortcuts matching sidebar labels and public access
+    path('portal/', lambda request: redirect('accounts:public_portal')),
+    path('apply/', lambda request: redirect('allocations:apply_seat')),
+    path('track/', lambda request: redirect('allocations:track_application')),
     path('amenities/', lambda request: redirect('rooms:amenity_list')),
     path('payment/', lambda request: redirect('finance:payment_list')),
     path('payments/', lambda request: redirect('finance:payment_list')),

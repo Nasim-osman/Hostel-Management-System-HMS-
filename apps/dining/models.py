@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from apps.residents.models import ResidentProfile
 
 
@@ -35,3 +36,25 @@ class MessFeedback(models.Model):
 
     def __str__(self):
         return f"{self.resident.student_id} - {self.meal_type} ({self.rating}/5)"
+
+
+class ResidentMealStatus(models.Model):
+    resident = models.ForeignKey(ResidentProfile, on_delete=models.CASCADE, related_name='meal_statuses')
+    date = models.DateField(default=timezone.now)
+    breakfast = models.BooleanField(default=True, verbose_name="Breakfast ON/OFF")
+    lunch = models.BooleanField(default=True, verbose_name="Lunch ON/OFF")
+    dinner = models.BooleanField(default=True, verbose_name="Dinner ON/OFF")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('resident', 'date')
+        ordering = ['-date']
+        verbose_name = 'Resident Meal Status'
+        verbose_name_plural = 'Resident Meal Statuses'
+
+    def __str__(self):
+        b = 'ON' if self.breakfast else 'OFF'
+        l = 'ON' if self.lunch else 'OFF'
+        d = 'ON' if self.dinner else 'OFF'
+        return f"{self.resident.student_id} ({self.date}): B:{b} | L:{l} | D:{d}"
+

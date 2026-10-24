@@ -67,19 +67,87 @@
             </div>
         </div>
 
-        <!-- Today's Mess Quick View -->
+        <!-- Today's Mess & Meal ON/OFF Controls -->
         <div class="hms-card">
-            <h2 class="hms-card-title">Today's Mess Menu</h2>
-            <div class="space-y-2 text-xs">
+            <div class="flex items-center justify-between mb-3">
                 <div>
-                    <span class="font-bold text-gray-600">Lunch:</span>
-                    <span class="text-gray-800">Sprouts | 3 Chapatis | Rice | Dal</span>
+                    <h2 class="hms-card-title mb-0">Today's Mess & Dining Status</h2>
+                    <span class="text-[11px] text-gray-400 font-medium">{{ today_date|date:"l, M d, Y" }}</span>
                 </div>
-                <div>
-                    <span class="font-bold text-gray-600">Dinner:</span>
-                    <span class="text-gray-800">Egg Curry | 3 Chapatis | Rice</span>
+                <!-- 1-Click Master Toggle -->
+                <form method="POST" action="{% url 'dining:toggle_meal' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="meal_type" value="all">
+                    <button type="submit" class="px-2.5 py-1 text-[11px] font-semibold rounded bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition">
+                        Toggle All Meals
+                    </button>
+                </form>
+            </div>
+
+            <!-- Meal Status Toggles -->
+            <div class="space-y-2.5 text-xs">
+                <!-- Breakfast -->
+                <div class="p-2.5 rounded-lg border {% if meal_status.breakfast %}border-green-200 bg-green-50/50{% else %}border-red-200 bg-red-50/40{% endif %} flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-gray-800">Breakfast</span>
+                            <span class="badge {% if meal_status.breakfast %}badge-success{% else %}badge-danger{% endif %} text-[10px]">
+                                {% if meal_status.breakfast %}● ON (Active){% else %}○ OFF (Paused){% endif %}
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-gray-500 mt-0.5">7:30 AM - 9:30 AM &bull; Paratha / Khichuri / Egg</p>
+                    </div>
+                    <form method="POST" action="{% url 'dining:toggle_meal' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="meal_type" value="breakfast">
+                        <button type="submit" class="px-2.5 py-1 text-[11px] font-semibold rounded {% if meal_status.breakfast %}bg-white text-red-600 border border-red-200 hover:bg-red-50{% else %}bg-green-600 text-white hover:bg-green-700 shadow-sm{% endif %} transition">
+                            {% if meal_status.breakfast %}Turn OFF{% else %}Turn ON{% endif %}
+                        </button>
+                    </form>
                 </div>
-                <div class="pt-2">
+
+                <!-- Lunch -->
+                <div class="p-2.5 rounded-lg border {% if meal_status.lunch %}border-green-200 bg-green-50/50{% else %}border-red-200 bg-red-50/40{% endif %} flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-gray-800">Lunch</span>
+                            <span class="badge {% if meal_status.lunch %}badge-success{% else %}badge-danger{% endif %} text-[10px]">
+                                {% if meal_status.lunch %}● ON (Active){% else %}○ OFF (Paused){% endif %}
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-gray-500 mt-0.5">1:00 PM - 3:00 PM &bull; Rice, Fish/Chicken, Dal, Veg</p>
+                    </div>
+                    <form method="POST" action="{% url 'dining:toggle_meal' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="meal_type" value="lunch">
+                        <button type="submit" class="px-2.5 py-1 text-[11px] font-semibold rounded {% if meal_status.lunch %}bg-white text-red-600 border border-red-200 hover:bg-red-50{% else %}bg-green-600 text-white hover:bg-green-700 shadow-sm{% endif %} transition">
+                            {% if meal_status.lunch %}Turn OFF{% else %}Turn ON{% endif %}
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Dinner -->
+                <div class="p-2.5 rounded-lg border {% if meal_status.dinner %}border-green-200 bg-green-50/50{% else %}border-red-200 bg-red-50/40{% endif %} flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-gray-800">Dinner</span>
+                            <span class="badge {% if meal_status.dinner %}badge-success{% else %}badge-danger{% endif %} text-[10px]">
+                                {% if meal_status.dinner %}● ON (Active){% else %}○ OFF (Paused){% endif %}
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-gray-500 mt-0.5">8:30 PM - 10:30 PM &bull; Rice/Ruti, Egg Curry, Dal</p>
+                    </div>
+                    <form method="POST" action="{% url 'dining:toggle_meal' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="meal_type" value="dinner">
+                        <button type="submit" class="px-2.5 py-1 text-[11px] font-semibold rounded {% if meal_status.dinner %}bg-white text-red-600 border border-red-200 hover:bg-red-50{% else %}bg-green-600 text-white hover:bg-green-700 shadow-sm{% endif %} transition">
+                            {% if meal_status.dinner %}Turn OFF{% else %}Turn ON{% endif %}
+                        </button>
+                    </form>
+                </div>
+
+                <div class="pt-2 flex items-center justify-between border-t border-gray-100">
+                    <span class="text-[11px] text-gray-400">Turning OFF saves meal fees.</span>
                     <a href="{% url 'dining:meal_menu' %}" class="text-xs text-blue-600 font-medium hover:underline">Full Weekly Menu & Feedback &rarr;</a>
                 </div>
             </div>

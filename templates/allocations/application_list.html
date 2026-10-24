@@ -68,7 +68,7 @@
                             <span class="text-xs text-gray-400">Processed</span>
                             {% endif %}
                         {% else %}
-                            <span class="text-xs text-gray-400">View</span>
+                            <a href="{% url 'allocations:track_application' %}?q={{ app.id }}" class="text-xs text-blue-600 font-semibold hover:underline">Track &rarr;</a>
                         {% endif %}
                     </td>
                 </tr>

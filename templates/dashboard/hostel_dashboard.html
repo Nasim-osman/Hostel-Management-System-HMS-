@@ -206,6 +206,29 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Meal Active Counts & Quick Toggles -->
+                <div class="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px]">
+                    <span class="text-gray-500 font-medium">Meal Tokens (ON):</span>
+                    <div class="flex items-center gap-1.5 font-semibold">
+                        <span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100" title="Breakfast Active Tokens">B: {{ meal_stats.breakfast_count|default:"1" }}</span>
+                        <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100" title="Lunch Active Tokens">L: {{ meal_stats.lunch_count|default:"1" }}</span>
+                        <span class="px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100" title="Dinner Active Tokens">D: {{ meal_stats.dinner_count|default:"1" }}</span>
+                    </div>
+                </div>
+
+                {% if resident_meal_status %}
+                <div class="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px]">
+                    <span class="text-gray-500">My Status:</span>
+                    <form method="POST" action="{% url 'dining:toggle_meal' %}" class="flex items-center gap-1">
+                        {% csrf_token %}
+                        <input type="hidden" name="meal_type" value="all">
+                        <button type="submit" class="text-[10px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold border border-slate-200">
+                            Toggle Today
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
             </div>
         </div>
 

@@ -28,9 +28,11 @@ def user_login_view(request):
                 'WARDEN': 'warden',
                 'ACCOUNTS': 'accounts',
                 'MAINTENANCE': 'maintenance',
-                'RESIDENT': 'resident_mike',
+                'RESIDENT': 'resident_nasim',
             }
             demo_user = User.objects.filter(username=username_map.get(demo_role)).first()
+            if not demo_user and demo_role == 'RESIDENT':
+                demo_user = User.objects.filter(username='resident_mike').first()
             if demo_user:
                 login(request, demo_user)
                 messages.success(request, f"Logged in as demo user: {demo_user.get_full_name()} ({demo_user.get_role_display()})")
@@ -56,6 +58,38 @@ def user_logout_view(request):
     logout(request)
     messages.info(request, "You have been successfully logged out.")
     return redirect('accounts:login')
+
+
+def public_portal_view(request):
+    """
+    Public University Hall & Hostel Residence Portal.
+    Accessible to guests, applicants, prospective residents, and visitors.
+    """
+    from apps.rooms.models import Room, Bed, Amenity, HostelBlock
+    from apps.notices.models import Notice
+    from apps.dining.models import MealMenu
+
+    total_rooms = Room.objects.count()
+    occupied_rooms = Room.objects.filter(beds__is_occupied=True).distinct().count()
+    vacant_rooms = total_rooms - occupied_rooms
+    total_capacity = Bed.objects.count()
+    occupied_beds = Bed.objects.filter(is_occupied=True).count()
+    vacant_beds = total_capacity - occupied_beds
+
+    amenities = Amenity.objects.all()[:6]
+    notices = Notice.objects.filter(is_published=True).order_by('-publish_date')[:4]
+    meals = MealMenu.objects.filter(is_active=True)
+
+    context = {
+        'total_rooms': total_rooms or 200,
+        'vacant_rooms': vacant_rooms if total_rooms > 0 else 50,
+        'total_capacity': total_capacity or 500,
+        'vacant_beds': vacant_beds if total_capacity > 0 else 125,
+        'amenities': amenities,
+        'notices': notices,
+        'meals': meals,
+    }
+    return render(request, 'public/landing.html', context)
 
 
 @login_required
@@ -151,6 +185,21 @@ def hostel_management_dashboard(request):
             event_name='VIEW_DASHBOARD'
         )
 
+    from apps.dining.models import MealMenu, ResidentMealStatus
+    today = timezone.now().date()
+    meal_stats = {
+        'breakfast_count': ResidentMealStatus.objects.filter(date=today, breakfast=True).count(),
+        'lunch_count': ResidentMealStatus.objects.filter(date=today, lunch=True).count(),
+        'dinner_count': ResidentMealStatus.objects.filter(date=today, dinner=True).count(),
+    }
+    resident_meal_status = None
+    if hasattr(request.user, 'resident_profile') and request.user.resident_profile:
+        resident_meal_status, _ = ResidentMealStatus.objects.get_or_create(
+            resident=request.user.resident_profile,
+            date=today,
+            defaults={'breakfast': True, 'lunch': True, 'dinner': True}
+        )
+
     context = {
         'total_rooms': total_rooms or 200,
         'occupied_rooms': occupied_rooms or 150,
@@ -164,6 +213,9 @@ def hostel_management_dashboard(request):
         'breakfast': breakfast,
         'lunch': lunch,
         'dinner': dinner,
+        'meal_stats': meal_stats,
+        'resident_meal_status': resident_meal_status,
+        'today_date': today,
         'unsolved_tickets': unsolved_tickets,
         'unsolved_count': unsolved_count,
         'active_visitors': active_visitors,

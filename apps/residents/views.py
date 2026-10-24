@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Sum
+from django.utils import timezone
 from apps.accounts.decorators import role_required, warden_or_admin_only, resident_access_only
 from .models import ResidentProfile
 from .forms import ResidentRegistrationForm, ResidentUpdateForm
@@ -140,6 +141,13 @@ def resident_dashboard_view(request):
     total_paid = Payment.objects.filter(resident=resident, status='VERIFIED').aggregate(Sum('amount'))['amount__sum'] or 0
     balance_due = max(0, total_charged - total_paid)
 
+    from apps.dining.models import MealMenu, ResidentMealStatus
+    today = timezone.now().date()
+    meal_status, _ = ResidentMealStatus.objects.get_or_create(
+        resident=resident,
+        date=today,
+        defaults={'breakfast': True, 'lunch': True, 'dinner': True}
+    )
     today_meals = MealMenu.objects.filter(is_active=True)
     recent_notices = Notice.objects.filter(is_published=True).order_by('-publish_date')[:4]
 
@@ -153,6 +161,8 @@ def resident_dashboard_view(request):
         'total_paid': total_paid,
         'balance_due': balance_due,
         'today_meals': today_meals,
+        'meal_status': meal_status,
+        'today_date': today,
         'recent_notices': recent_notices,
     }
     return render(request, 'residents/resident_dashboard.html', context)

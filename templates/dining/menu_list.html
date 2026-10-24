@@ -16,6 +16,100 @@
         {% endif %}
     </div>
 
+    {% if meal_status %}
+    <!-- Resident Meal ON / OFF Status Panel -->
+    <div class="hms-card bg-gradient-to-r from-blue-50/40 to-slate-50 border-blue-100">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+                <h2 class="hms-card-title mb-0">My Meal Attendance (ON / OFF)</h2>
+                <p class="text-xs text-gray-500">Toggle meals ON or OFF. Turning a meal OFF pauses your token and saves your monthly meal cost.</p>
+            </div>
+            <form method="POST" action="{% url 'dining:toggle_meal' %}">
+                {% csrf_token %}
+                <input type="hidden" name="meal_type" value="all">
+                <button type="submit" class="px-3 py-1.5 text-xs font-semibold rounded bg-[#0060af] hover:bg-[#005096] text-white shadow-sm transition">
+                    Toggle All Today's Meals
+                </button>
+            </form>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <!-- Breakfast -->
+            <div class="p-3 bg-white rounded-lg border {% if meal_status.breakfast %}border-emerald-200 shadow-sm{% else %}border-red-200 bg-red-50/20{% endif %} flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-bold text-gray-700 block">Breakfast</span>
+                    <span class="badge {% if meal_status.breakfast %}badge-success{% else %}badge-danger{% endif %} text-[10px] mt-1">
+                        {% if meal_status.breakfast %}● ON (Token Active){% else %}○ OFF (Paused){% endif %}
+                    </span>
+                </div>
+                <form method="POST" action="{% url 'dining:toggle_meal' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="meal_type" value="breakfast">
+                    <button type="submit" class="px-2.5 py-1 text-xs font-semibold rounded {% if meal_status.breakfast %}text-red-600 bg-red-50 hover:bg-red-100 border border-red-200{% else %}text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200{% endif %}">
+                        {% if meal_status.breakfast %}Turn OFF{% else %}Turn ON{% endif %}
+                    </button>
+                </form>
+            </div>
+
+            <!-- Lunch -->
+            <div class="p-3 bg-white rounded-lg border {% if meal_status.lunch %}border-emerald-200 shadow-sm{% else %}border-red-200 bg-red-50/20{% endif %} flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-bold text-gray-700 block">Lunch</span>
+                    <span class="badge {% if meal_status.lunch %}badge-success{% else %}badge-danger{% endif %} text-[10px] mt-1">
+                        {% if meal_status.lunch %}● ON (Token Active){% else %}○ OFF (Paused){% endif %}
+                    </span>
+                </div>
+                <form method="POST" action="{% url 'dining:toggle_meal' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="meal_type" value="lunch">
+                    <button type="submit" class="px-2.5 py-1 text-xs font-semibold rounded {% if meal_status.lunch %}text-red-600 bg-red-50 hover:bg-red-100 border border-red-200{% else %}text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200{% endif %}">
+                        {% if meal_status.lunch %}Turn OFF{% else %}Turn ON{% endif %}
+                    </button>
+                </form>
+            </div>
+
+            <!-- Dinner -->
+            <div class="p-3 bg-white rounded-lg border {% if meal_status.dinner %}border-emerald-200 shadow-sm{% else %}border-red-200 bg-red-50/20{% endif %} flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-bold text-gray-700 block">Dinner</span>
+                    <span class="badge {% if meal_status.dinner %}badge-success{% else %}badge-danger{% endif %} text-[10px] mt-1">
+                        {% if meal_status.dinner %}● ON (Token Active){% else %}○ OFF (Paused){% endif %}
+                    </span>
+                </div>
+                <form method="POST" action="{% url 'dining:toggle_meal' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="meal_type" value="dinner">
+                    <button type="submit" class="px-2.5 py-1 text-xs font-semibold rounded {% if meal_status.dinner %}text-red-600 bg-red-50 hover:bg-red-100 border border-red-200{% else %}text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200{% endif %}">
+                        {% if meal_status.dinner %}Turn OFF{% else %}Turn ON{% endif %}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% elif stats %}
+    <!-- Staff Headcount Summary -->
+    <div class="hms-card bg-slate-50 border-slate-200">
+        <div class="flex items-center justify-between mb-2">
+            <h2 class="hms-card-title mb-0">Today's Hall Mess Headcount (Active Tokens)</h2>
+            <span class="text-xs text-gray-500 font-medium">{{ today_date|date:"l, M d" }}</span>
+        </div>
+        <div class="grid grid-cols-3 gap-3 text-center text-xs">
+            <div class="p-2.5 bg-white rounded border border-gray-200">
+                <span class="text-gray-500 block text-[11px]">Breakfast Headcount</span>
+                <span class="text-lg font-bold text-emerald-600">{{ stats.breakfast_count|default:"1" }}</span>
+            </div>
+            <div class="p-2.5 bg-white rounded border border-gray-200">
+                <span class="text-gray-500 block text-[11px]">Lunch Headcount</span>
+                <span class="text-lg font-bold text-blue-600">{{ stats.lunch_count|default:"1" }}</span>
+            </div>
+            <div class="p-2.5 bg-white rounded border border-gray-200">
+                <span class="text-gray-500 block text-[11px]">Dinner Headcount</span>
+                <span class="text-lg font-bold text-indigo-600">{{ stats.dinner_count|default:"1" }}</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Meal Cards matching dashboard style -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
         {% for meal in meals %}

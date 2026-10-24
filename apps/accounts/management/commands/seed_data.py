@@ -27,10 +27,10 @@ class Command(BaseCommand):
 
         # 1. Create Core Role Users
         users_data = [
-            {'username': 'admin', 'email': 'admin@hms.university.edu', 'first_name': 'Kazi Tanvir', 'last_name': 'Ahmed', 'role': User.Role.ADMIN, 'phone': '+880 1711 000001'},
-            {'username': 'warden', 'email': 'warden@hms.university.edu', 'first_name': 'Dr. Mohammad', 'last_name': 'Rafiq', 'role': User.Role.WARDEN, 'phone': '+880 1819 000002'},
-            {'username': 'accounts', 'email': 'accounts@hms.university.edu', 'first_name': 'Mahfuzur', 'last_name': 'Rahman', 'role': User.Role.ACCOUNTS, 'phone': '+880 1912 000003'},
-            {'username': 'maintenance', 'email': 'maintenance@hms.university.edu', 'first_name': 'Md. Abul', 'last_name': 'Kalam', 'role': User.Role.MAINTENANCE, 'phone': '+880 1515 000004'},
+            {'username': 'admin', 'email': 'admin@hms.university.edu', 'first_name': 'Admin', 'last_name': 'Nasim', 'role': User.Role.ADMIN, 'phone': '+880 1711 000001'},
+            {'username': 'warden', 'email': 'warden@hms.university.edu', 'first_name': 'Warden', 'last_name': 'Nasim', 'role': User.Role.WARDEN, 'phone': '+880 1819 000002'},
+            {'username': 'accounts', 'email': 'accounts@hms.university.edu', 'first_name': 'Accounts', 'last_name': 'Nasim', 'role': User.Role.ACCOUNTS, 'phone': '+880 1912 000003'},
+            {'username': 'maintenance', 'email': 'maintenance@hms.university.edu', 'first_name': 'Maintenance', 'last_name': 'Nasim', 'role': User.Role.MAINTENANCE, 'phone': '+880 1515 000004'},
         ]
 
         created_users = {}
@@ -134,8 +134,8 @@ class Command(BaseCommand):
 
         # 4. Create Key Named Residents (Exact match to screenshot tickets: Mike Ross, Jennifer Grint, Casey Allen, Tina Harris, Rick Butcher)
         named_residents_data = [
-            {'username': 'resident_mike', 'name': ('Mike', 'Ross'), 'email': 'mike.ross@student.edu', 'id': 'DU-CSE-2022-001', 'course': 'Computer Science & Eng. (B.Sc)', 'room_idx': 0, 'ticket': 'Water not Comming', 'category': Complaint.Category.PLUMBING},
-            {'username': 'resident_jennifer', 'name': ('Jennifer', 'Grint'), 'email': 'jennifer.g@student.edu', 'id': 'DU-EEE-2022-002', 'course': 'Electrical & Electronic Eng.', 'room_idx': 1, 'ticket': 'Light is not available since last night', 'category': Complaint.Category.ELECTRICAL},
+            {'username': 'resident_nasim', 'name': ('Resident', 'Nasim'), 'email': 'resident.nasim@student.edu', 'id': 'DU-CSE-2022-001', 'course': 'Computer Science & Eng. (B.Sc)', 'room_idx': 0, 'ticket': 'Water not Comming', 'category': Complaint.Category.PLUMBING},
+            {'username': 'resident_mike', 'name': ('Resident', 'Nasim'), 'email': 'resident.mike@student.edu', 'id': 'DU-CSE-2022-002', 'course': 'Computer Science & Eng. (B.Sc)', 'room_idx': 1, 'ticket': 'Light is not available since last night', 'category': Complaint.Category.ELECTRICAL},
             {'username': 'resident_casey', 'name': ('Casey', 'Allen'), 'email': 'casey.a@student.edu', 'id': 'BUET-ME-2022-003', 'course': 'Mechanical Engineering', 'room_idx': 2, 'ticket': 'Wifi is not working since past week, please fix it.', 'category': Complaint.Category.WIFI},
             {'username': 'resident_tina', 'name': ('Tina', 'Harris'), 'email': 'tina.h@student.edu', 'id': 'JU-IIT-2023-004', 'course': 'Information Technology (B.Sc)', 'room_idx': 3, 'ticket': 'Laundry is not working properly, please look into this quickly', 'category': Complaint.Category.LAUNDRY},
             {'username': 'resident_rick', 'name': ('Rick', 'Butcher'), 'email': 'rick.b@student.edu', 'id': 'SUST-SWE-2022-005', 'course': 'Software Engineering (B.Sc)', 'room_idx': 4, 'ticket': 'Hot water tap is broken, please fix it urgently', 'category': Complaint.Category.PLUMBING},

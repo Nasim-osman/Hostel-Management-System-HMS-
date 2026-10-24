@@ -3,34 +3,162 @@
 {% block title %}Apply for Hostel Seat — HMS{% endblock %}
 
 {% block content %}
-<div class="max-w-xl mx-auto space-y-6">
-    <div>
-        <a href="{% url 'allocations:application_list' %}" class="text-xs text-blue-600 hover:underline">&larr; Back to Applications</a>
-        <h1 class="text-2xl font-bold tracking-tight text-gray-900 mt-1">Hostel Seat Application</h1>
-        <p class="text-xs text-gray-500">Submit your preferences for room allocation in the upcoming academic semester.</p>
+<div class="max-w-2xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            {% if request.user.is_authenticated %}
+            <a href="{% url 'allocations:application_list' %}" class="text-xs text-blue-600 hover:underline">&larr; Back to Applications</a>
+            {% else %}
+            <a href="{% url 'accounts:public_portal' %}" class="text-xs text-blue-600 hover:underline">&larr; Back to Guest Portal</a>
+            {% endif %}
+            <h1 class="text-2xl font-bold tracking-tight text-gray-900 mt-1">Hostel Seat Application</h1>
+            <p class="text-xs text-gray-500">Official university hall residence allotment form for students and new applicants.</p>
+        </div>
+        <a href="{% url 'allocations:track_application' %}" class="text-xs font-semibold text-emerald-600 hover:underline">
+            Track Existing Application &rarr;
+        </a>
     </div>
 
     <div class="hms-card">
-        <form method="POST" class="space-y-4">
+        <form method="POST" class="space-y-5">
             {% csrf_token %}
+
+            {% if is_public %}
+            <!-- SECTION 1: Personal & Academic Credentials -->
             <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Preferred Room Sharing Type</label>
-                {{ form.preferred_room_type }}
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Preferred Hostel Block</label>
-                {{ form.preferred_block }}
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-700 mb-1">Academic Year</label>
-                {{ form.academic_year }}
+                <h3 class="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3 pb-1 border-b border-gray-100 flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px]">1</span>
+                    Student Academic & Contact Information
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <div class="md:col-span-2">
+                        <label class="block font-semibold text-gray-700 mb-1">Full Name (As per University Admit Card) *</label>
+                        {{ form.full_name }}
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Student Roll / ID Number *</label>
+                        {{ form.student_id }}
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Department / Course *</label>
+                        {{ form.course }}
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Batch / Academic Session *</label>
+                        {{ form.batch_year }}
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Gender *</label>
+                        {{ form.gender }}
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Student Contact Mobile Number *</label>
+                        {{ form.phone_number }}
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Student Email Address *</label>
+                        {{ form.email }}
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Blood Group (Optional)</label>
+                        {{ form.blood_group }}
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Home District / City</label>
+                        {{ form.home_district }}
+                    </div>
+                </div>
             </div>
 
-            <div class="pt-4 border-t border-gray-100 flex items-center justify-end space-x-2">
-                <a href="{% url 'allocations:application_list' %}" class="px-4 py-2 border border-gray-300 rounded text-xs font-medium text-gray-700 hover:bg-gray-50">Cancel</a>
-                <button type="submit" class="px-4 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded">Submit Application</button>
+            <!-- SECTION 2: Guardian Information -->
+            <div class="pt-2">
+                <h3 class="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3 pb-1 border-b border-gray-100 flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px]">2</span>
+                    Guardian & Emergency Contact
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Guardian Name *</label>
+                        {{ form.guardian_name }}
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Relationship *</label>
+                        {{ form.guardian_relation }}
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Guardian Mobile Phone *</label>
+                        {{ form.guardian_phone }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: Hostel Preference -->
+            <div class="pt-2">
+                <h3 class="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3 pb-1 border-b border-gray-100 flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px]">3</span>
+                    Hostel Block & Room Preference
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Preferred Block</label>
+                        {{ form.preferred_block }}
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Room Sharing Type *</label>
+                        {{ form.preferred_room_type }}
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Academic Year</label>
+                        {{ form.academic_year }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4: Create Portal Password -->
+            <div class="pt-2">
+                <h3 class="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3 pb-1 border-b border-gray-100 flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px]">4</span>
+                    HMS Student Portal Account Password
+                </h3>
+                <div class="text-xs">
+                    <label class="block font-semibold text-gray-700 mb-1">Create Password (For logging in to check your status) *</label>
+                    {{ form.password }}
+                    <p class="text-[11px] text-gray-400 mt-1">Your username will be your Student ID. Save this password securely.</p>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- Authenticated Resident Simple Form -->
+            <div class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-semibold text-gray-700 mb-1">Preferred Room Sharing Type</label>
+                    {{ form.preferred_room_type }}
+                </div>
+                <div>
+                    <label class="block font-semibold text-gray-700 mb-1">Preferred Hostel Block</label>
+                    {{ form.preferred_block }}
+                </div>
+                <div>
+                    <label class="block font-semibold text-gray-700 mb-1">Academic Year</label>
+                    {{ form.academic_year }}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
+                <div class="text-[11px] text-gray-400">
+                    Application will be reviewed by Hall Provost / Warden.
+                </div>
+                <div class="flex items-center space-x-2">
+                    <a href="{% if request.user.is_authenticated %}{% url 'allocations:application_list' %}{% else %}{% url 'accounts:public_portal' %}{% endif %}" 
+                       class="px-4 py-2 border border-gray-300 rounded text-xs font-medium text-gray-700 hover:bg-gray-50">Cancel</a>
+                    <button type="submit" class="px-5 py-2 bg-[#0060af] hover:bg-[#005096] text-white text-xs font-semibold rounded shadow-sm">
+                        Submit Seat Application
+                    </button>
+                </div>
             </div>
         </form>
     </div>
 </div>
 {% endblock %}
+

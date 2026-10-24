@@ -6,6 +6,8 @@ app_name = 'allocations'
 urlpatterns = [
     path('applications/', views.application_list_view, name='application_list'),
     path('applications/apply/', views.apply_seat_view, name='apply_seat'),
+    path('apply/', views.apply_seat_view),
+    path('track/', views.track_application_view, name='track_application'),
     path('applications/<int:app_id>/review/', views.review_application_view, name='review_application'),
     path('applications/<int:app_id>/allocate/', views.allocate_bed_view, name='allocate_bed'),
     path('waiting-list/', views.waiting_list_view, name='waiting_list'),
