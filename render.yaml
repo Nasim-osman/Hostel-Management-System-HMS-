@@ -1,0 +1,29 @@
+databases:
+  - name: hms-postgres
+    databaseName: hms_db
+    user: hms_user
+    plan: free
+
+services:
+  - type: web
+    name: hms-portal
+    runtime: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application"
+    healthCheckPath: "/health/"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hms-postgres
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: PYTHON_VERSION
+        value: "3.12.2"
+      - key: TIME_ZONE
+        value: "Asia/Dhaka"
+      - key: CURRENCY_SYMBOL
+        value: "৳"

@@ -3,8 +3,10 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
+from django.http import JsonResponse
 
 urlpatterns = [
+    path('health/', lambda request: JsonResponse({'status': 'healthy', 'system': 'HMS'}), name='health_check'),
     path('admin/', admin.site.urls),
     path('', lambda request: redirect('accounts:dashboard' if request.user.is_authenticated else 'accounts:public_portal')),
     path('accounts/', include('apps.accounts.urls', namespace='accounts')),
